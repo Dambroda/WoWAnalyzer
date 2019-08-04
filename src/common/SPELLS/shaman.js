@@ -26,6 +26,11 @@ export default {
     name: 'Earthbind Totem',
     icon: 'spell_nature_strengthofearthtotem02',
   },
+  RESONANCE_TOTEM: {
+    id: 262417,
+    name: 'Resonance Totem',
+    icon: 'spell_nature_stoneskintotem',
+  },
   PURGE: {
     id: 370,
     name: 'Purge',
@@ -151,6 +156,12 @@ export default {
     name: 'Lava Burst',
     icon: 'spell_shaman_lavaburst',
     manaCost: 1200,
+    coefficient: 0.53125,
+  },
+  LAVA_BURST_DAMAGE: {
+    id: 285452,
+    name: 'Lava Burst',
+    icon: 'spell_shaman_lavaburst',
   },
   LAVA_BURST_OVERLOAD: {
     id: 77451,
@@ -319,11 +330,6 @@ export default {
     name: 'Aftershock',
     icon: 'spell_nature_stormreach',
   },
-  EXPOSED_ELEMENTS_TALENT_DEBUFF: {
-    id: 269808,
-    name: "Exposed Elements Debuff",
-    icon: "spell_nature_callstorm",
-  },
   MASTER_OF_THE_ELEMENTS_BUFF: {
     id: 260734,
     name: "Master Of The Elements Buff",
@@ -452,6 +458,11 @@ export default {
   STORMBRINGER: {
     id: 201845,
     name: 'Stormbringer',
+    icon: 'spell_nature_stormreach',
+  },
+  STORMBRINGER_BUFF: {
+    id: 201846,
+    name: 'Stormbringer Buff',
     icon: 'spell_nature_stormreach',
   },
   MAELSTROM_WEAPON: {
@@ -702,6 +713,11 @@ export default {
   },
   ASCENDANCE_HEAL: {
     id: 114083,
+    name: 'Ascendance',
+    icon: 'spell_fire_elementaldevastation',
+  },
+  ASCENDANCE_INITIAL_HEAL: {
+    id: 294020,
     name: 'Ascendance',
     icon: 'spell_fire_elementaldevastation',
   },

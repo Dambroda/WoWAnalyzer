@@ -4,7 +4,7 @@ import TraitStatisticBox, { STATISTIC_ORDER } from 'interface/others/TraitStatis
 
 import SPELLS from 'common/SPELLS';
 import { calculateAzeriteEffects } from 'common/stats';
-import EchoOfLight from 'parser/priest/holy/modules/core/EchoOfLight_Mastery';
+import EchoOfLight from 'parser/priest/holy/modules/core/EchoOfLightMastery';
 import { formatThousands } from 'common/format';
 import ItemHealingDone from 'interface/others/ItemHealingDone';
 
@@ -60,14 +60,8 @@ class BlessedSanctuary extends Analyzer {
       <TraitStatisticBox
         position={STATISTIC_ORDER.OPTIONAL()}
         trait={SPELLS.BLESSED_SANCTUARY.id}
-        value={(
-          <>
-            <ItemHealingDone amount={this.effectiveHealing} /><br />
-          </>
-        )}
-        tooltip={`
-          ${formatThousands(this.effectiveHealing)} Total Healing
-        `}
+        value={<ItemHealingDone amount={this.effectiveHealing} />}
+        tooltip={`${formatThousands(this.effectiveHealing)} Total Healing`}
       />
     );
   }

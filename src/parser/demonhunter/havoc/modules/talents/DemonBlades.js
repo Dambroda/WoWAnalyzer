@@ -1,5 +1,6 @@
 import React from 'react';
 import SPELLS from 'common/SPELLS';
+import SpellLink from 'common/SpellLink';
 import TalentStatisticBox from 'interface/others/TalentStatisticBox';
 import STATISTIC_ORDER from 'interface/others/STATISTIC_ORDER';
 import Events from 'parser/core/Events';
@@ -53,9 +54,9 @@ class DemonBlades extends Analyzer{
   suggestions(when) {
     when(this.suggestionThresholds)
       .addSuggestion((suggest, actual, recommended) => {
-        return suggest(<> Be mindful of your fury levels and spend it before capping.</>)
+        return suggest(<> Be mindful of your Fury levels and spend it before capping your Fury due to <SpellLink id={SPELLS.DEMON_BLADES_TALENT.id} />.</>)
           .icon(SPELLS.DEMON_BLADES_TALENT.icon)
-          .actual(`${formatPercentage(actual)}% fury wasted`)
+          .actual(`${formatPercentage(actual)}% Fury wasted`)
           .recommended(`${formatPercentage(recommended)}% is recommended.`);
       });
   }
@@ -66,16 +67,20 @@ class DemonBlades extends Analyzer{
       <TalentStatisticBox
         talent={SPELLS.DEMON_BLADES_TALENT.id}
         position={STATISTIC_ORDER.OPTIONAL(6)}
-        value={(<>
-                {this.furyPerMin} fury per min <br />
-                {this.owner.formatItemDamageDone(this.damage)}
-              </>)}
-        tooltip={`
-          ${formatThousands(this.damage)} Total damage<br />
-          ${effectiveFuryGain} Effective fury gained<br />
-          ${this.furyGain} Total fury gained<br />
-          ${this.furyWaste} Fury wasted
-        `}
+        value={(
+          <>
+            {this.furyPerMin} <small>Fury per min</small> <br />
+            {this.owner.formatItemDamageDone(this.damage)}
+          </>
+        )}
+        tooltip={(
+          <>
+            {formatThousands(this.damage)} Total damage<br />
+            {effectiveFuryGain} Effective Fury gained<br />
+            {this.furyGain} Total Fury gained<br />
+            {this.furyWaste} Fury wasted
+          </>
+        )}
       />
     );
   }

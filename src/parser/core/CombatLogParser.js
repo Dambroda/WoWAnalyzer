@@ -1,22 +1,26 @@
 import React from 'react';
 
 import { findByBossId } from 'raids';
-import { formatDuration, formatNumber, formatPercentage, formatThousands } from 'common/format';
+import { formatDuration, formatNumber, formatPercentage } from 'common/format';
 import ItemIcon from 'common/ItemIcon';
 import ItemLink from 'common/ItemLink';
-import ChangelogTab from 'interface/others/ChangelogTab';
-import ChangelogTabTitle from 'interface/others/ChangelogTabTitle';
 import DeathRecapTracker from 'interface/others/DeathRecapTracker';
 import ItemStatisticBox from 'interface/others/ItemStatisticBox';
+import MODULE_ERROR from 'parser/core/MODULE_ERROR';
 
-import ApplyBuffNormalizer from 'parser/shared/normalizers/ApplyBuff';
-import CancelledCastsNormalizer from 'parser/shared/normalizers/CancelledCasts';
-import PrePullCooldownsNormalizer from 'parser/shared/normalizers/PrePullCooldowns';
-import FightEndNormalizer from 'parser/shared/normalizers/FightEnd';
-import PhaseChangesNormalizer from 'parser/shared/normalizers/PhaseChanges';
-import HealingDone from '../shared/modules/HealingDone';
-import DamageDone from '../shared/modules/DamageDone';
-import DamageTaken from '../shared/modules/DamageTaken';
+// Normalizers
+import ApplyBuffNormalizer from '../shared/normalizers/ApplyBuff';
+import CancelledCastsNormalizer from '../shared/normalizers/CancelledCasts';
+import PrePullCooldownsNormalizer from '../shared/normalizers/PrePullCooldowns';
+import FightEndNormalizer from '../shared/normalizers/FightEnd';
+import PhaseChangesNormalizer from '../shared/normalizers/PhaseChanges';
+import MissingCastsNormalizer from '../shared/normalizers/MissingCasts';
+
+// Core modules
+import HealingDone from '../shared/modules/throughput/HealingDone';
+import DamageDone from '../shared/modules/throughput/DamageDone';
+import DamageTaken from '../shared/modules/throughput/DamageTaken';
+import ThroughputStatisticGroup from '../shared/modules/throughput/ThroughputStatisticGroup';
 import DeathTracker from '../shared/modules/DeathTracker';
 
 import Combatants from '../shared/modules/Combatants';
@@ -37,17 +41,12 @@ import Pets from '../shared/modules/Pets';
 import ManaValues from '../shared/modules/ManaValues';
 import SpellManaCost from '../shared/modules/SpellManaCost';
 import Channeling from '../shared/modules/Channeling';
-import TimelineBuffEvents from '../shared/modules/TimelineBuffEvents';
 import DeathDowntime from '../shared/modules/downtime/DeathDowntime';
 import TotalDowntime from '../shared/modules/downtime/TotalDowntime';
-
 import DistanceMoved from '../shared/modules/others/DistanceMoved';
+import DispelTracker from '../shared/modules/DispelTracker';
 
-import CharacterTab from '../shared/modules/features/CharacterTab';
-import EncounterPanel from '../shared/modules/features/EncounterPanel';
 // Tabs
-import TimelineTab from '../shared/modules/features/TimelineTab';
-import ManaTab from '../shared/modules/features/ManaTab';
 import RaidHealthTab from '../shared/modules/features/RaidHealthTab';
 
 import CritEffectBonus from '../shared/modules/helpers/CritEffectBonus';
@@ -59,13 +58,14 @@ import FoodChecker from '../shared/modules/items/FoodChecker';
 import Healthstone from '../shared/modules/items/Healthstone';
 import HealthPotion from '../shared/modules/items/HealthPotion';
 import CombatPotion from '../shared/modules/items/CombatPotion';
-import PreparationRuleAnalyzer from '../shared/modules/features/Checklist2/PreparationRuleAnalyzer';
+import PreparationRuleAnalyzer from '../shared/modules/features/Checklist/PreparationRuleAnalyzer';
 
 // Racials
 import ArcaneTorrent from '../shared/modules/racials/bloodelf/ArcaneTorrent';
 import GiftOfTheNaaru from '../shared/modules/racials/draenei/GiftOfTheNaaru';
 import MightOfTheMountain from '../shared/modules/racials/dwarf/MightOfTheMountain';
 import Stoneform from '../shared/modules/racials/dwarf/Stoneform';
+import Berserking from '../shared/modules/racials/troll/Berserking';
 
 // Shared Buffs
 import VantusRune from '../shared/modules/spells/VantusRune';
@@ -90,6 +90,8 @@ import RotcrustedVoodooDoll from '../shared/modules/items/bfa/dungeons/Rotcruste
 import AzerokksResonatingHeart from '../shared/modules/items/bfa/dungeons/AzerokksResonatingHeart';
 import VesselOfSkitteringShadows from '../shared/modules/items/bfa/dungeons/VesselOfSkitteringShadows';
 import LadyWaycrestsMusicBox from '../shared/modules/items/bfa/dungeons/LadyWaycrestsMusicBox';
+import IgnitionMagesFuse from '../shared/modules/items/bfa/dungeons/IgnitionMagesFuse';
+
 // PVP
 import DreadGladiatorsMedallion from '../shared/modules/items/bfa/pvp/DreadGladiatorsMedallion';
 import DreadGladiatorsInsignia from '../shared/modules/items/bfa/pvp/DreadGladiatorsInsignia';
@@ -106,6 +108,7 @@ import CoastalSurge from '../shared/modules/items/bfa/enchants/CoastalSurge';
 import DarkmoonDeckTides from '../shared/modules/items/bfa/crafted/DarkmoonDeckTides';
 import DarkmoonDeckFathoms from '../shared/modules/items/bfa/crafted/DarkmoonDeckFathoms';
 import DarkmoonDeckBlockades from '../shared/modules/items/bfa/crafted/DarkmoonDeckBlockades';
+import EternalAlchemistStone from '../shared/modules/items/bfa/crafted/EternalAlchemistStone';
 // Azerite Traits
 import Gemhide from '../shared/modules/spells/bfa/azeritetraits/Gemhide';
 import CrystallineCarapace from '../shared/modules/spells/bfa/azeritetraits/CrystallineCarapace';
@@ -132,6 +135,12 @@ import SwirlingSands from '../shared/modules/spells/bfa/azeritetraits/SwirlingSa
 import Tradewinds from '../shared/modules/spells/bfa/azeritetraits/Tradewinds';
 import TreacherousCovenant from '../shared/modules/spells/bfa/azeritetraits/TreacherousCovenant';
 
+// Essences
+import TheEverRisingTide from '../shared/modules/spells/bfa/essences/TheEverRisingTide';
+import TheCrucibleofFlame from '../shared/modules/spells/bfa/essences/TheCrucibleofFlame';
+import WorldveinResonance from '../shared/modules/spells/bfa/essences/WorldveinResonance';
+import NullDynamo from '../shared/modules/spells/bfa/essences/NullDynamo';
+
 // Uldir
 import TwitchingTentacleofXalzaix from '../shared/modules/items/bfa/raids/uldir/TwitchingTentacleofXalzaix';
 import VigilantsBloodshaper from '../shared/modules/items/bfa/raids/uldir/VigilantsBloodshaper';
@@ -141,16 +150,33 @@ import ConstructOvercharger from '../shared/modules/items/bfa/raids/uldir/Constr
 import SyringeOfBloodborneInfirmity from '../shared/modules/items/bfa/raids/uldir/SyringeOfBloodborneInfirmity';
 import DiscOfSystematicRegression from '../shared/modules/items/bfa/raids/uldir/DiscOfSystematicRegression';
 // BoD
+import DiamondLacedReflectingPrism from '../shared/modules/items/bfa/raids/bod/DiamondLacedReflectingPrism';
+import WardOfEnvelopment from '../shared/modules/items/bfa/raids/bod/WardOfEnvelopment';
 import CrestOfPaku from '../shared/modules/items/bfa/raids/bod/CrestOfPaku';
 import IncandescentSliver from '../shared/modules/items/bfa/raids/bod/IncandescentSliver';
+// Crucible of Storms
+import AbyssalSpeakersGauntlets from '../shared/modules/items/bfa/raids/crucibleofstorms/AbyssalSpeakersGauntlets';
+import FathuulsFloodguards from '../shared/modules/items/bfa/raids/crucibleofstorms/FathuulsFloodguards';
+import FathomDredgers from '../shared/modules/items/bfa/raids/crucibleofstorms/FathomDredgers';
+import GripsOfForsakenSanity from '../shared/modules/items/bfa/raids/crucibleofstorms/GripsOfForsakenSanity';
+import HarbingersInscrutableWill from '../shared/modules/items/bfa/raids/crucibleofstorms/HarbingersInscrutableWill';
+import IdolOfIndiscriminateConsumption from '../shared/modules/items/bfa/raids/crucibleofstorms/IdolOfIndiscriminateConsumption';
+import LeggingsOfTheAberrantTidesage from '../shared/modules/items/bfa/raids/crucibleofstorms/LeggingsOfTheAberrantTidesage';
+import LegplatesOfUnboundAnguish from '../shared/modules/items/bfa/raids/crucibleofstorms/LegplatesOfUnboundAnguish';
+import LurkersInsidiousGift from '../shared/modules/items/bfa/raids/crucibleofstorms/LurkersInsidiousGift';
+import MalformedHeraldsLegwraps from '../shared/modules/items/bfa/raids/crucibleofstorms/MalformedHeraldsLegwraps';
+import StormglideSteps from '../shared/modules/items/bfa/raids/crucibleofstorms/StormglideSteps';
+import TridentOfDeepOcean from '../shared/modules/items/bfa/raids/crucibleofstorms/TridentOfDeepOcean';
+import VoidStone from '../shared/modules/items/bfa/raids/crucibleofstorms/VoidStone';
+import ZaxasjsDeepstriders from '../shared/modules/items/bfa/raids/crucibleofstorms/ZaxasjsDeepstriders';
 
 import ParseResults from './ParseResults';
-import Analyzer from './Analyzer';
 import EventsNormalizer from './EventsNormalizer';
 import EventEmitter from './modules/EventEmitter';
 
 // This prints to console anything that the DI has to do
 const debugDependencyInjection = false;
+const isMinified = process.env.NODE_ENV === 'production';
 
 class CombatLogParser {
   static abilitiesAffectedByHealingIncreases = [];
@@ -169,11 +195,13 @@ class CombatLogParser {
     cancelledCastsNormalizer: CancelledCastsNormalizer,
     prepullNormalizer: PrePullCooldownsNormalizer,
     phaseChangesNormalizer: PhaseChangesNormalizer,
+    missingCastsNormalize: MissingCastsNormalizer,
 
     // Analyzers
     healingDone: HealingDone,
     damageDone: DamageDone,
     damageTaken: DamageTaken,
+    throughputStatisticGroup: ThroughputStatisticGroup,
     deathTracker: DeathTracker,
 
     enemies: Enemies,
@@ -195,16 +223,12 @@ class CombatLogParser {
     manaValues: ManaValues,
     vantusRune: VantusRune,
     distanceMoved: DistanceMoved,
-    timelineBuffEvents: TimelineBuffEvents,
     deathRecapTracker: DeathRecapTracker,
+    dispels: DispelTracker,
 
     critEffectBonus: CritEffectBonus,
 
     // Tabs
-    characterTab: CharacterTab,
-    encounterPanel: EncounterPanel,
-    timelineTab: TimelineTab,
-    manaTab: ManaTab,
     raidHealthTab: RaidHealthTab,
 
     prePotion: PrePotion,
@@ -221,6 +245,7 @@ class CombatLogParser {
     giftOfTheNaaru: GiftOfTheNaaru,
     mightOfTheMountain: MightOfTheMountain,
     stoneform: Stoneform,
+    berserking: Berserking,
 
     // Items:
     // BFA
@@ -244,6 +269,8 @@ class CombatLogParser {
     azerokksResonatingHeart: AzerokksResonatingHeart,
     vesselOfSkitteringShadows: VesselOfSkitteringShadows,
     ladyWaycrestsMusicBox: LadyWaycrestsMusicBox,
+    ingnitionMagesFuse: IgnitionMagesFuse,
+
     // PVP
     dreadGladiatorsMedallion: DreadGladiatorsMedallion,
     dreadGladiatorsInsignia: DreadGladiatorsInsignia,
@@ -252,6 +279,7 @@ class CombatLogParser {
     darkmoonDeckTides: DarkmoonDeckTides,
     darkmoonDeckFathoms: DarkmoonDeckFathoms,
     darkmoonDeckBlockades: DarkmoonDeckBlockades,
+    eternalAlchemistStone: EternalAlchemistStone,
     // Enchants
     deadlyNavigation: DeadlyNavigation,
     masterfulNavigation: MasterfulNavigation,
@@ -286,6 +314,12 @@ class CombatLogParser {
     tradewinds: Tradewinds,
     treacherousCovenant: TreacherousCovenant,
 
+    // Essences
+    theEverRisingTide: TheEverRisingTide,
+    theCrucibleofFlame: TheCrucibleofFlame,
+    worldveinResonance: WorldveinResonance,
+    nullDynamo: NullDynamo,
+
     // Uldir
     twitchingTentacleofXalzaix: TwitchingTentacleofXalzaix,
     vigilantsBloodshaper: VigilantsBloodshaper,
@@ -295,8 +329,25 @@ class CombatLogParser {
     syringeOfBloodborneInfirmity: SyringeOfBloodborneInfirmity,
     discOfSystematicRegression: DiscOfSystematicRegression,
     // BoD
+    diamondLacedReflectingPrism: DiamondLacedReflectingPrism,
+    wardOfEnvelopment: WardOfEnvelopment,
     crestOfPaku: CrestOfPaku,
     incandescentSliver: IncandescentSliver,
+    // Crucible of Storms
+    abyssalSpeakersGauntlets: AbyssalSpeakersGauntlets,
+    fathuulsFloodguards: FathuulsFloodguards,
+    fathomDredgers: FathomDredgers,
+    harbingersInscrutableWill: HarbingersInscrutableWill,
+    idolOfIndiscriminateConsumption: IdolOfIndiscriminateConsumption,
+    gripsOfForsakenSanity: GripsOfForsakenSanity,
+    leggingsOfTheAberrantTidesage: LeggingsOfTheAberrantTidesage,
+    legplatesOfUnboundAnguish: LegplatesOfUnboundAnguish,
+    lurkersInsidiousGift: LurkersInsidiousGift,
+    malformedHeraldsLegwraps: MalformedHeraldsLegwraps,
+    stormglideSteps: StormglideSteps,
+    tridentOfDeepOcean: TridentOfDeepOcean,
+    voidStone: VoidStone,
+    zaxasjsDeepstriders: ZaxasjsDeepstriders,
   };
   // Override this with spec specific modules when extending
   static specModules = {};
@@ -310,17 +361,17 @@ class CombatLogParser {
   // Character info from the Battle.net API (optional)
   characterProfile = null;
 
+  //Disabled Modules
+  disabledModules = null;
+
   adjustForDowntime = true;
   get hasDowntime() {
     return this.getModule(TotalDowntime).totalBaseDowntime > 0;
   }
 
   _modules = {};
-  _activeAnalyzers = {};
   get activeModules() {
-    return Object.keys(this._modules)
-      .map(key => this._modules[key])
-      .filter(module => module.active);
+    return Object.values(this._modules).filter(module => module.active);
   }
 
   get playerId() {
@@ -339,12 +390,10 @@ class CombatLogParser {
   }
   finished = false;
 
-  get playersById() {
-    return this.report.friendlies.reduce((obj, player) => {
-      obj[player.id] = player;
-      return obj;
-    }, {});
+  get players() {
+    return this.report.friendlies;
   }
+  /** @var {Combatant} */
   get selectedCombatant() {
     return this.getModule(Combatants).selected;
   }
@@ -360,7 +409,11 @@ class CombatLogParser {
     this.characterProfile = characterProfile;
     this._timestamp = selectedFight.start_time;
     this.boss = findByBossId(selectedFight.boss);
-
+    this.disabledModules = {};
+    //initialize disabled modules for each state
+    Object.values(MODULE_ERROR).forEach(key => {
+      this.disabledModules[key] = [];
+    });
     this.initializeModules({
       ...this.constructor.internalModules,
       ...this.constructor.defaultModules,
@@ -369,8 +422,15 @@ class CombatLogParser {
   }
   finish() {
     this.finished = true;
+    /** @var {EventEmitter} */
     const emitter = this.getModule(EventEmitter);
-    console.log('Called listeners', emitter._listenersCalled, 'times, with', emitter._actualExecutions, 'actual executions.', emitter._listenersCalled - emitter._actualExecutions, 'events were filtered away');
+    console.log(
+      'Events triggered:', emitter.numTriggeredEvents,
+      'Event listeners added:', emitter.numEventListeners,
+      'Listeners called:', emitter.numListenersCalled,
+      'Listeners called (after filters):', emitter.numActualExecutions,
+      'Listeners filtered away:', emitter.numListenersCalled - emitter.numActualExecutions
+    );
   }
 
   _getModuleClass(config) {
@@ -392,7 +452,7 @@ class CombatLogParser {
       Object.keys(dependencies).forEach(desiredDependencyName => {
         const dependencyClass = dependencies[desiredDependencyName];
 
-        const dependencyModule = this.getModule(dependencyClass, false);
+        const dependencyModule = this.getModule(dependencyClass, true);
         if (dependencyModule) {
           availableDependencies[desiredDependencyName] = dependencyModule;
         } else {
@@ -421,6 +481,7 @@ class CombatLogParser {
       });
     }
     // TODO: Remove module naming
+    module.key = desiredModuleName;
     this._modules[desiredModuleName] = module;
     return module;
   }
@@ -446,14 +507,29 @@ class CombatLogParser {
         }
         // The priority goes from lowest (most important) to highest, seeing as modules are loaded after their dependencies are loaded, just using the count of loaded modules is sufficient.
         const priority = Object.keys(this._modules).length;
-        this.loadModule(moduleClass, {
-          ...options,
-          ...availableDependencies,
-          priority,
-        }, desiredModuleName);
+        try{
+          this.loadModule(moduleClass, {
+            ...options,
+            ...availableDependencies,
+            priority,
+          }, desiredModuleName);
+        }catch(e){
+          if (process.env.NODE_ENV !== 'production') {
+            throw e;
+          }
+          this.disabledModules[MODULE_ERROR.INITIALIZATION].push({key: isMinified ? desiredModuleName : moduleClass.name, module: moduleClass, error: e});
+          debugDependencyInjection && console.warn(moduleClass.name, 'disabled due to error during initialization: ', e);
+        }
+
       } else {
-        debugDependencyInjection && console.warn(moduleClass.name, 'could not be loaded, missing dependencies:', missingDependencies.map(d => d.name));
-        failedModules.push(desiredModuleName);
+        const disabledDependencies = missingDependencies.map(d => d.name).filter(x => this.disabledModules[MODULE_ERROR.INITIALIZATION].map(d => d.module.name).includes(x)); //see if a dependency was previously disabled due to an error
+        if(disabledDependencies.length !== 0){ //if a dependency was already marked as disabled due to an error, mark this module as disabled
+          this.disabledModules[MODULE_ERROR.DEPENDENCY].push({key: isMinified ? desiredModuleName : moduleClass.name, module: moduleClass});
+          debugDependencyInjection && console.warn(moduleClass.name, 'disabled due to error during initialization of a dependency.');
+        }else{
+          debugDependencyInjection && console.warn(moduleClass.name, 'could not be loaded, missing dependencies:', missingDependencies.map(d => d.name));
+          failedModules.push(desiredModuleName);
+        }
       }
     });
 
@@ -473,17 +549,22 @@ class CombatLogParser {
     }
   }
   allModulesInitialized() {
-    this._activeAnalyzers = Object.values(this._modules)
-      .filter(module => module instanceof Analyzer)
-      .sort((a, b) => a.priority - b.priority); // lowest should go first, as `priority = 0` will have highest prio
+    // Executed when module initialization is complete
   }
-  getModule(type, required = true) {
-    const module = Object.keys(this._modules)
-      .map(key => this._modules[key])
-      .find(module => module instanceof type);
-    if (required && !module) {
+  _moduleCache = new Map();
+  getModule(type, optional = false) {
+    // We need to use a cache and can't just set this on initialization because we sometimes search by the inheritance chain.
+    const cacheEntry = this._moduleCache.get(type);
+    if (cacheEntry !== undefined) {
+      return cacheEntry;
+    }
+
+    // Search for a specific module by its type, accepting any modules that have the type somewhere in the inheritance chain
+    const module = Object.values(this._modules).find(module => module instanceof type);
+    if (optional === false && module === undefined) {
       throw new Error(`Module not found: ${type.name}`);
     }
+    this._moduleCache.set(type, module);
     return module;
   }
 
@@ -506,20 +587,24 @@ class CombatLogParser {
     this.getModule(EventEmitter).addEventListener(...args);
   }
 
-  deepDisable(module) {
-    console.error('Disabling', module.constructor.name);
+  deepDisable(module, state, error = undefined) {
+    if(!module.active){
+      return; //return early
+    }
+    console.error('Disabling', isMinified ? module.key : module.constructor.name);
+    this.disabledModules[state].push({key: isMinified ? module.key : module.constructor.name, module: module.constructor, ...(error && {error: error})});
     module.active = false;
     this.activeModules.forEach(active => {
         const deps = active.constructor.dependencies;
         if (deps && Object.values(deps).find(depClass => module instanceof depClass)) {
-          this.deepDisable(active);
+          this.deepDisable(active, MODULE_ERROR.DEPENDENCY);
         }
       }
     );
   }
 
   byPlayer(event, playerId = this.player.id) {
-    return (event.sourceID === playerId);
+    return event.sourceID === playerId;
   }
   toPlayer(event, playerId = this.player.id) {
     return (event.targetID === playerId);
@@ -549,12 +634,6 @@ class CombatLogParser {
   getPercentageOfTotalDamageTaken(damageTaken) {
     return damageTaken / this.getModule(DamageTaken).total.effective;
   }
-  formatItemDamageTaken(damageTaken) {
-    return `${formatPercentage(this.getPercentageOfTotalDamageTaken(damageTaken))} % / ${formatNumber(damageTaken / this.fightDuration * 1000)} DTPS`;
-  }
-  formatManaRestored(manaRestored) {
-    return `${formatThousands(manaRestored)} mana / ${formatThousands(manaRestored / this.fightDuration * 1000 * 5)} MP5`;
-  }
   formatTimestamp(timestamp, precision = 0) {
     return formatDuration((timestamp - this.fight.start_time) / 1000, precision);
   }
@@ -562,77 +641,101 @@ class CombatLogParser {
   generateResults({ i18n, adjustForDowntime }) {
     this.adjustForDowntime = adjustForDowntime;
 
-    const results = new ParseResults();
+    let results;
 
-    results.tabs = [];
-    results.tabs.push({
-      title: <ChangelogTabTitle />,
-      url: 'changelog',
-      order: 1000,
-      render: () => <ChangelogTab />,
-    });
+    const addStatistic = (statistic, basePosition, key) => {
+      const position = statistic.props.position !== undefined ? statistic.props.position : basePosition;
 
-    Object.keys(this._modules)
-      .filter(key => this._modules[key].active)
-      .sort((a, b) => this._modules[b].priority - this._modules[a].priority)
-      .forEach((key, index) => {
-        const module = this._modules[key];
+      results.statistics.push(
+        React.cloneElement(statistic, {
+          key,
+          position,
+        })
+      );
+    };
 
-        if (module.statistic) {
-          const statistic = module.statistic({ i18n });
-          if (statistic) {
-            let position = index;
-            if (statistic.props.position !== undefined) {
-              position = statistic.props.position;
-            } else if (module.statisticOrder !== undefined) {
-              position = module.statisticOrder;
-              console.warn('DEPRECATED', 'Setting the position of a statistic via a module\'s `statisticOrder` prop is deprecated. Set the `position` prop on the `StatisticBox` instead. Example commit: https://github.com/WoWAnalyzer/WoWAnalyzer/commit/ece1bbeca0d3721ede078d256a30576faacb803d');
+    const attemptResultGeneration = () => {
+      return Object.keys(this._modules)
+        .filter(key => this._modules[key].active)
+        .sort((a, b) => this._modules[b].priority - this._modules[a].priority)
+        .every((key, index) => {
+          const module = this._modules[key];
+
+          try{
+            if (module.statistic) {
+              let basePosition = index;
+              if (module.statisticOrder !== undefined) {
+                basePosition = module.statisticOrder;
+                console.warn('DEPRECATED', 'Setting the position of a statistic via a module\'s `statisticOrder` prop is deprecated. Set the `position` prop on the `StatisticBox` instead. Example commit: https://github.com/WoWAnalyzer/WoWAnalyzer/commit/ece1bbeca0d3721ede078d256a30576faacb803d', module);
+              }
+
+              const statistic = module.statistic({ i18n });
+              if (statistic) {
+                if (Array.isArray(statistic)) {
+                  statistic.forEach((statistic, statisticIndex) => {
+                    addStatistic(statistic, basePosition, `${key}-statistic-${statisticIndex}`);
+                  });
+                } else {
+                  addStatistic(statistic, basePosition, `${key}-statistic`);
+                }
+              }
             }
+            if (module.item) {
+              const item = module.item({ i18n });
+              if (item) {
+                if (React.isValidElement(item)) {
+                  results.statistics.push(React.cloneElement(item, {
+                    key: `${key}-item`,
+                    position: index,
+                  }));
+                } else {
+                  const id = item.id || item.item.id;
+                  const itemDetails = id && this.selectedCombatant.getItem(id);
+                  const icon = item.icon || <ItemIcon id={item.item.id} details={itemDetails} />;
+                  const title = item.title || <ItemLink id={item.item.id} details={itemDetails} icon={false} />;
 
-            results.statistics.push(
-              React.cloneElement(statistic, {
-                key: `${key}-statistic`,
-                position,
-              })
-            );
-          }
-        }
-        if (module.item) {
-          const item = module.item({ i18n });
-          if (item) {
-            if (React.isValidElement(item)) {
-              results.statistics.push(React.cloneElement(item, {
-                key: `${key}-item`,
-                position: index,
-              }));
-            } else {
-              const id = item.id || item.item.id;
-              const itemDetails = id && this.selectedCombatant.getItem(id);
-              const icon = item.icon || <ItemIcon id={item.item.id} details={itemDetails} />;
-              const title = item.title || <ItemLink id={item.item.id} details={itemDetails} icon={false} />;
-
-              results.statistics.push(
-                <ItemStatisticBox
-                  key={`${key}-item`}
-                  position={index}
-                  icon={icon}
-                  label={title}
-                  value={item.result}
-                />
-              );
+                  results.statistics.push(
+                    <ItemStatisticBox
+                      key={`${key}-item`}
+                      position={index}
+                      icon={icon}
+                      label={title}
+                      value={item.result}
+                      tooltip={item.tooltip}
+                    />
+                  );
+                }
+              }
             }
+            if (module.tab) {
+              const tab = module.tab({ i18n });
+              if (tab) {
+                results.tabs.push(tab);
+              }
+            }
+            if (module.suggestions) {
+              module.suggestions(results.suggestions.when, { i18n });
+            }
+          }catch(e){ //error occured during results generation of module, disable module and all modules depending on it
+            if (process.env.NODE_ENV !== 'production') {
+              throw e;
+            }
+            this.deepDisable(module, MODULE_ERROR.RESULTS, e);
+            //break loop and start again with inaccurate modules now disabled (in case of modules being rendered before their dependencies' errors are encountered)
+            return false;
           }
-        }
-        if (module.tab) {
-          const tab = module.tab({ i18n });
-          if (tab) {
-            results.tabs.push(tab);
-          }
-        }
-        if (module.suggestions) {
-          module.suggestions(results.suggestions.when, { i18n });
-        }
-      });
+          return true;
+        });
+    };
+
+    //keep trying to generate results until no "new" errors are found anymore to weed out all the inaccurate / errored modules
+    let generated = false;
+    while(!generated){
+      results = new ParseResults();
+
+      results.tabs = [];
+      generated = attemptResultGeneration();
+    }
 
     return results;
   }

@@ -1,8 +1,10 @@
 import React from 'react';
-import SPELLS from 'common/SPELLS/index';
-import ITEMS from 'common/ITEMS/index';
+import SPELLS from 'common/SPELLS';
+import ITEMS from 'common/ITEMS';
 import ItemLink from 'common/ItemLink';
 import { formatPercentage } from 'common/format';
+import ItemStatistic from 'interface/statistics/ItemStatistic';
+import BoringItemValueText from 'interface/statistics/components/BoringItemValueText';
 
 import Analyzer from 'parser/core/Analyzer';
 import Abilities from 'parser/core/modules/Abilities';
@@ -14,9 +16,11 @@ const BUFF_DURATION = 20; // seconds
 
 /**
  * Use: Your next 6 healing spells restore [x] mana. (2 Min Cooldown)
- * 
+ *
  * The restored mana appears as energize events in the combat log.
  * The buff expires after 20 seconds or after casting 6 spells, whichever is sooner.
+ * 
+ * Test Log: https://www.warcraftlogs.com/reports/ML4k1XNYFDPJ6ARb#fight=1&type=damage-done
  */
 class FangsOfIntertwinedEssence extends Analyzer {
   static dependencies = {
@@ -26,7 +30,7 @@ class FangsOfIntertwinedEssence extends Analyzer {
   manaRestored = 0;
   useCount = 0;
   restoreCount = 0;
-  
+
   constructor(...args) {
     super(...args);
     this.active = this.selectedCombatant.hasTrinket(ITEMS.FANGS_OF_INTERTWINED_ESSENCE.id);
@@ -66,17 +70,23 @@ class FangsOfIntertwinedEssence extends Analyzer {
   get restoresPerUse() {
     return this.restoreCount / this.useCount;
   }
-  
-  item() {
-    return {
-      item: ITEMS.FANGS_OF_INTERTWINED_ESSENCE,
-      result: (
-        <dfn data-tip={`Activated <b>${this.useCount}</b> time${this.useCount === 1 ? '' : 's'} of a possible <b>${this.possibleUseCount}</b>.<br />
-          You cast an average of <b>${this.restoresPerUse.toFixed(1)}</b> eligible spells during each activation, out of a possible <b>${MAX_RESTORES_PER_USE}</b>.`}>
-          <ItemManaGained amount={this.manaRestored} />
-        </dfn>
-      ),
-    };
+
+  statistic() {
+    return (
+      <ItemStatistic
+        size="flexible"
+        tooltip={(
+          <>
+            Activated <strong>{this.useCount}</strong> time{this.useCount === 1 ? '' : 's'} of a possible <strong>{this.possibleUseCount}</strong>. <br />
+            You cast an average of <strong>{this.restoresPerUse.toFixed(1)}</strong> eligible spells during each activation, out of a possible <strong>{MAX_RESTORES_PER_USE}</strong>.
+          </>
+        )}
+      >
+        <BoringItemValueText item={ITEMS.FANGS_OF_INTERTWINED_ESSENCE}>
+          <ItemManaGained amount={this.manaRestored} /> 
+        </BoringItemValueText>
+      </ItemStatistic>
+    );
   }
 
   get suggestionThresholds() {

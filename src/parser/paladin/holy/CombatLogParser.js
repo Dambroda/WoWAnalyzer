@@ -1,6 +1,7 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import LowHealthHealing from 'parser/shared/modules/features/LowHealthHealing';
-import HealingDone from 'parser/shared/modules/HealingDone';
+import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
+import ManaUsageChart from 'parser/shared/modules/resources/mana/ManaUsageChart';
 
 import LightOfDawnNormalizer from './normalizers/LightOfDawn';
 import DivinePurposeNormalizer from './normalizers/DivinePurpose';
@@ -25,6 +26,7 @@ import LightOfDawnIndexer from './modules/LightOfDawnIndexer';
 import SpellManaCost from './modules/core/SpellManaCost';
 
 import Abilities from './modules/Abilities';
+import Buffs from './modules/Buffs';
 import Checklist from './modules/checklist/Module';
 import MasteryEffectiveness from './modules/MasteryEffectiveness';
 import AlwaysBeCasting from './modules/AlwaysBeCasting';
@@ -35,15 +37,21 @@ import MightOfTheMountain from './modules/MightOfTheMountain';
 
 import RuleOfLaw from './modules/talents/RuleOfLaw';
 import DevotionAuraDamageReduction from './modules/talents/DevotionAuraDamageReduction';
-// import DevotionAuraLivesSaved from './Modules/Talents/DevotionAuraLivesSaved';
 import AuraOfSacrificeDamageReduction from './modules/talents/AuraOfSacrificeDamageReduction';
-// import AuraOfSacrificeLivesSaved from './Modules/Talents/AuraOfSacrificeLivesSaved';
 import AuraOfMercy from './modules/talents/AuraOfMercy';
 import HolyAvenger from './modules/talents/HolyAvenger';
 import DivinePurpose from './modules/talents/DivinePurpose';
 import CrusadersMight from './modules/talents/CrusadersMight';
+import AvengingCrusader from './modules/talents/AvengingCrusader';
+
+// azurite traits //
+import GraceOfTheJusticar from './modules/azeritetraits/GraceOfTheJusticar';
+import GlimmerOfLight from './modules/azeritetraits/GlimmerOfLight';
 
 import { ABILITIES_AFFECTED_BY_HEALING_INCREASES } from './constants';
+
+// azurite traits //
+import RadiantIncandescence from './modules/azeritetraits/RadiantIncandescence';
 
 class CombatLogParser extends CoreCombatLogParser {
   static abilitiesAffectedByHealingIncreases = ABILITIES_AFFECTED_BY_HEALING_INCREASES;
@@ -59,7 +67,6 @@ class CombatLogParser extends CoreCombatLogParser {
     lowHealthHealing: LowHealthHealing,
 
     // PaladinCore
-    healingDone: [HealingDone, { showStatistic: true }],
     beaconTransferFactor: BeaconTransferFactor,
     beaconHealSource: BeaconHealSource,
     beaconHealingDone: BeaconHealingDone,
@@ -76,9 +83,14 @@ class CombatLogParser extends CoreCombatLogParser {
     lightOfDawnIndexer: LightOfDawnIndexer,
     spellManaCost: SpellManaCost,
 
+    // Generic healer things
+    manaLevelChart: ManaLevelChart,
+    manaUsageChart: ManaUsageChart,
+
     // Features
     checklist: Checklist,
     abilities: Abilities,
+    buffs: Buffs,
     masteryEffectiveness: MasteryEffectiveness,
     alwaysBeCasting: AlwaysBeCasting,
     cooldownThroughputTracker: CooldownThroughputTracker,
@@ -90,13 +102,17 @@ class CombatLogParser extends CoreCombatLogParser {
     // Talents
     ruleOfLaw: RuleOfLaw,
     devotionAuradamageReduction: DevotionAuraDamageReduction,
-    // devotionAuraLivesSaved: DevotionAuraLivesSaved,
     auraOfSacrificeDamageReduction: AuraOfSacrificeDamageReduction,
-    // auraOfSacrificeLivesSaved: AuraOfSacrificeLivesSaved,
     auraOfMercy: AuraOfMercy,
     holyAvenger: HolyAvenger,
     divinePurpose: DivinePurpose,
     crusadersMight: CrusadersMight,
+    avengingCrusader: AvengingCrusader,
+
+    // Azureite Traits //
+    graceOfTheJusticar: GraceOfTheJusticar,
+    radiantIncandescence: RadiantIncandescence,
+    glimmerOfLight: GlimmerOfLight,
   };
 }
 

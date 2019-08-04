@@ -6,8 +6,10 @@ import { encodeTargetString } from 'parser/shared/modules/EnemyInstances';
 import Haste from 'parser/shared/modules/Haste';
 
 import SPELLS from 'common/SPELLS';
-import StatisticBox from 'interface/others/StatisticBox';
-import SpellIcon from 'common/SpellIcon';
+
+import Statistic from 'interface/statistics/Statistic';
+import BoringSpellValueText from 'interface/statistics/components/BoringSpellValueText';
+import STATISTIC_ORDER from 'interface/others/STATISTIC_ORDER';
 
 const BUFFER = 100;
 const BASE_ROF_DURATION = 8000;
@@ -53,8 +55,7 @@ class RainOfFire extends Analyzer {
     const target = encodeTargetString(event.targetID, event.targetInstance);
     if (filtered.length === 0) {
       debug && this.log('Something weird happened, ROF damage without any ongoing casts', event);
-    }
-    else if (filtered.length === 1) {
+    } else if (filtered.length === 1) {
       // single active ROF, attribute the targets hit to it
       const cast = filtered[0];
       const timeSinceLastTick = event.timestamp - (cast.lastTickTimestamp || cast.timestamp);
@@ -67,8 +68,7 @@ class RainOfFire extends Analyzer {
       if (!cast.targetsHit.includes(target)) {
         cast.targetsHit.push(target);
       }
-    }
-    else {
+    } else {
       // multiple ROFs active
       // if any cast's last tick is within 100ms of current timestamp, it's probably still the same tick
       const possibleCurrentTickCast = filtered.find(cast => event.timestamp <= cast.lastTickTimestamp + BUFFER);
@@ -76,8 +76,7 @@ class RainOfFire extends Analyzer {
         if (!possibleCurrentTickCast.targetsHit.includes(target)) {
           possibleCurrentTickCast.targetsHit.push(target);
         }
-      }
-      else {
+      } else {
         // it's a "fresh" damage tick (first of them)
         // need to find out which cast in `filtered` it "belongs to"
         const sortedByDelta = filtered.map(cast => {
@@ -126,12 +125,15 @@ class RainOfFire extends Analyzer {
       return null;
     }
     return (
-      <StatisticBox
-        icon={<SpellIcon id={SPELLS.RAIN_OF_FIRE_CAST.id} />}
-        value={this.averageTargetsHit.toFixed(2)}
-        label={'Average targets hit with Rain of Fire'}
+      <Statistic
+        position={STATISTIC_ORDER.CORE(6)}
+        size="small"
         tooltip="There's a possibility of a mistake in assigning targets hit to individual casts, when there are multiple Rains of Fire overlapping."
-      />
+      >
+        <BoringSpellValueText spell={SPELLS.RAIN_OF_FIRE_CAST}>
+          {this.averageTargetsHit.toFixed(2)} <small>average targets hit</small>
+        </BoringSpellValueText>
+      </Statistic>
     );
   }
 }

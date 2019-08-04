@@ -1,11 +1,13 @@
 import React from 'react';
-import Analyzer from 'parser/core/Analyzer';
-import StatisticBox from 'interface/others/StatisticBox';
-import SpellIcon from 'common/SpellIcon';
-import STATISTIC_CATEGORY from 'interface/others/STATISTIC_CATEGORY';
-import { formatDuration, formatPercentage } from 'common/format';
 
-const MS_BUFFER = 100;
+import SpellIcon from 'common/SpellIcon';
+import { formatDuration, formatPercentage } from 'common/format';
+import SpellLink from 'common/SpellLink';
+import StatisticBox from 'interface/others/StatisticBox';
+import STATISTIC_CATEGORY from 'interface/others/STATISTIC_CATEGORY';
+import UptimeIcon from 'interface/icons/Uptime';
+import CriticalStrikeIcon from 'interface/icons/CriticalStrike';
+import Analyzer from 'parser/core/Analyzer';
 
 /**
  * Navigation Enchants
@@ -41,96 +43,37 @@ class Navigation extends Analyzer {
     this.active = this.hasTrackedEnchant();
   }
 
-  isBuggedStackChange(previousTime, currentTime){
-    return previousTime > (currentTime - MS_BUFFER);
+  get smallStackBuffUptime() {
+    return this.selectedCombatant.getBuffUptime(this.constructor.smallBuffId);
   }
-
-  get cleanStacks() {
-    const cleanStacks = {
-      0: [
-        {
-          start: this.owner.fight.start_time,
-          end: null,
-          duration: null,
-        },
-      ],
-    };
-    let lastHandledStack = 0;
-
-    const buffStacks = this.selectedCombatant.getBuffHistory(this.constructor.smallBuffId).reduce((obj, buff) => {
-      obj[buff.start] = buff.stackHistory;
-      return obj;
-    }, {});
-
-    Object.values(buffStacks).forEach((stackChain) => {
-      stackChain.forEach((stack) => {
-        const stackSize = stack.stacks;
-        const stackStart = stack.timestamp;
-        if (cleanStacks[lastHandledStack]) {
-          const previousStack = cleanStacks[lastHandledStack];
-          const lastOccurrence = previousStack[previousStack.length - 1];
-          if (this.isBuggedStackChange(lastOccurrence.start, stackStart)){
-            return;
-          }
-
-          if (lastOccurrence.end === null) {
-            lastOccurrence.end = stackStart;
-            lastOccurrence.duration = lastOccurrence.end - lastOccurrence.start;
-          }
-        }
-
-        if (cleanStacks[stackSize] === undefined) {
-          cleanStacks[stackSize] = [];
-        }
-
-        const stackInfo = {
-          start: stackStart,
-          end: null,
-          duration: null,
-        };
-        cleanStacks[stackSize].push(stackInfo);
-        lastHandledStack = stackSize;
-      });
-    });
-
-    if (cleanStacks[lastHandledStack]) {
-      const previousStack = cleanStacks[lastHandledStack];
-      const lastOccurrence = previousStack[previousStack.length - 1];
-      if (lastOccurrence.end === null) {
-        lastOccurrence.end = this.owner.fight.end_time;
-        lastOccurrence.duration = lastOccurrence.end - lastOccurrence.start;
-      }
-    }
-
-    return cleanStacks;
-  }
-  maxStackBuffUptime() {
+  get maxStackBuffUptime() {
     return this.selectedCombatant.getBuffUptime(this.constructor.bigBuffId);
   }
   get averageStat() {
-    const buffStacks = this.cleanStacks;
+    const buffStacks = this.selectedCombatant.getStackBuffUptimes(this.constructor.smallBuffId);
 
     const smallBuffDuration = Object.keys(buffStacks).reduce((total, stackSize) => {
-      const totalStackDuration = buffStacks[stackSize]
-        .map(element => element.duration)
-        .reduce((total, current) => total + current);
-
-      return total + (totalStackDuration * stackSize);
+      return total + (buffStacks[stackSize] * stackSize);
     }, 0);
 
     const smallBuffIncrease = smallBuffDuration * this.constructor.statPerStack;
-    const bigBuffIncrease = this.maxStackBuffUptime() * this.constructor.statAtMax;
+    const bigBuffIncrease = this.maxStackBuffUptime * this.constructor.statAtMax;
 
-    return ((smallBuffIncrease + bigBuffIncrease) / this.owner.fightDuration).toFixed(2);
+    return ((smallBuffIncrease + bigBuffIncrease) / this.owner.fightDuration).toFixed(0);
   }
-  item() {
-    const buffStacks = this.cleanStacks;
-    const maxStackBuffDuration = this.maxStackBuffUptime();
-    const tooltipData = (
+  statistic() {
+    const buffStacks = this.selectedCombatant.getStackBuffUptimes(this.constructor.smallBuffId);
+    const maxStackBuffDuration = this.maxStackBuffUptime;
+    return (
       <StatisticBox
         icon={<SpellIcon id={this.constructor.smallBuffId} />}
-        value={this.averageStat}
-        label={`average ${this.constructor.primaryStat} gained`}
+        value={(
+          <>
+            <UptimeIcon /> {formatPercentage((this.smallStackBuffUptime + maxStackBuffDuration) / this.owner.fightDuration, 0)}% <small>uptime</small><br />
+            <CriticalStrikeIcon /> {this.averageStat} <small>average {this.constructor.primaryStat} gained</small>
+          </>
+        )}
+        label={<SpellLink id={this.constructor.smallBuffId} icon={false} />}
         category={STATISTIC_CATEGORY.ITEMS}
       >
         <table className="table table-condensed">
@@ -144,9 +87,7 @@ class Navigation extends Analyzer {
           <tbody>
             {
               Object.keys(buffStacks).map((stackSize) => {
-                let totalStackDuration = buffStacks[stackSize]
-                  .map(element => element.duration)
-                  .reduce((total, current) => total + current);
+                let totalStackDuration = buffStacks[stackSize];
 
                 if (stackSize === '0'){
                   totalStackDuration -= maxStackBuffDuration;
@@ -170,7 +111,6 @@ class Navigation extends Analyzer {
         </table>
       </StatisticBox>
     );
-    return tooltipData;
   }
 }
 export default Navigation;

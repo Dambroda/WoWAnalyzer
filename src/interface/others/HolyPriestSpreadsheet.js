@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import SPELLS from 'common/SPELLS';
 import AbilityTracker from 'parser/shared/modules/AbilityTracker';
 import CastEfficiency from 'parser/shared/modules/CastEfficiency';
-import HealingDone from 'parser/shared/modules/HealingDone';
+import HealingDone from 'parser/shared/modules/throughput/HealingDone';
 import HealingReceived from 'parser/priest/holy/modules/features/HealingReceived';
-import DamageTaken from 'parser/shared/modules/DamageTaken';
+import DamageTaken from 'parser/shared/modules/throughput/DamageTaken';
 import DeathTracker from 'parser/shared/modules/DeathTracker';
 import ManaValues from 'parser/shared/modules/ManaValues';
 import HolyWordSanctify from 'parser/priest/holy/modules/spells/holyword/HolyWordSanctify';
@@ -18,6 +18,7 @@ import EverlastingLight from 'parser/priest/holy/modules/spells/azeritetraits/Ev
 import PermeatingGlow from 'parser/priest/holy/modules/spells/azeritetraits/PermeatingGlow';
 import PrayerfulLitany from 'parser/priest/holy/modules/spells/azeritetraits/PrayerfulLitany';
 import WordOfMending from 'parser/priest/holy/modules/spells/azeritetraits/WordOfMending';
+import DamageDone from 'parser/shared/modules/throughput/DamageDone';
 
 class HolyPriestSpreadsheet extends React.Component {
   static propTypes = {
@@ -59,11 +60,9 @@ class HolyPriestSpreadsheet extends React.Component {
 
       if (!efficiency) {
         return 'N/A';
-      }
-      else if (efficiency.efficiency) {
+      } else if (efficiency.efficiency) {
         return efficiency.efficiency.toFixed(5);
-      }
-      else if (efficiency.maxCasts !== Infinity) {
+      } else if (efficiency.maxCasts !== Infinity) {
         return '0.00000';
       } else {
         return 1;
@@ -220,6 +219,10 @@ class HolyPriestSpreadsheet extends React.Component {
               <tr>
                 <td>Damage Taken</td>
                 <td>{parser.getModule(DamageTaken)._total._regular}</td>
+              </tr>
+              <tr>
+                <td>Damage Done</td>
+                <td>{parser.getModule(DamageDone)._total._regular}</td>
               </tr>
               <tr>
                 <td>Deaths</td>
@@ -438,6 +441,14 @@ class HolyPriestSpreadsheet extends React.Component {
                 <td>{cpm(SPELLS.HOLY_WORD_SALVATION_TALENT.id)}</td>
                 <td>{castEfficiency(SPELLS.HOLY_WORD_SALVATION_TALENT.id)}</td>
                 <td>{targetsPerCast(SPELLS.HOLY_WORD_SALVATION_TALENT.id)}</td>
+              </tr>
+              <tr>
+                <td>Holy Nova</td>
+                <td>{rawHealing(SPELLS.HOLY_NOVA_HEAL.id)}</td>
+                <td>{overhealingSpell(SPELLS.HOLY_NOVA_HEAL.id)}</td>
+                <td>{cpm(SPELLS.HOLY_NOVA.id)}</td>
+                <td>{castEfficiency(SPELLS.HOLY_NOVA.id)}</td>
+                <td>{targetsPerCast(SPELLS.HOLY_NOVA.id, SPELLS.HOLY_NOVA_HEAL.id)}</td>
               </tr>
               <tr>
                 <td>Echo of Light</td>

@@ -19,10 +19,10 @@ const PURIFY_DELAY_THRESHOLD = 1250; // 1.25s, gives a bit of flexibility in cas
 function markupPurify(event, delay, hasHeavyStagger) {
   const msgs = [];
   if(delay > PURIFY_DELAY_THRESHOLD) {
-    msgs.push(`<li>You delayed casting it for <b>${(delay / 1000).toFixed(2)}s</b> after being hit, allowing Stagger to tick down.</li>`);
+    msgs.push(<li>You delayed casting it for <b>{(delay / 1000).toFixed(2)}s</b> after being hit, allowing Stagger to tick down.</li>);
   }
   if(!hasHeavyStagger) {
-    msgs.push(`<li>You cast without reaching at least Heavy Stagger, which is <em>almost always</em> inefficient.</li>`);
+    msgs.push(<li>You cast without reaching at least Heavy Stagger, which is <em>almost always</em> inefficient.</li>);
   }
 
   if(msgs.length === 0) {
@@ -30,7 +30,12 @@ function markupPurify(event, delay, hasHeavyStagger) {
   }
   const meta = event.meta || {};
   meta.isInefficientCast = true;
-  meta.inefficientCastReason = `This Purifying Brew cast was inefficient because:<ul>${msgs.join('')}</ul>`;
+  meta.inefficientCastReason = (
+<>
+    This Purifying Brew cast was inefficient because:
+    <ul>{msgs}</ul>
+  </>
+);
   event.meta = meta;
 }
 
@@ -213,12 +218,16 @@ class PurifyingBrew extends Analyzer {
     return (
       <StatisticBox
         icon={<SpellIcon id={SPELLS.PURIFYING_BREW.id} />}
-        value={`${formatNumber(this.meanPurify)}`}
+        value={formatNumber(this.meanPurify)}
         label="Avg. Mitigation per Purifying Brew"
-        tooltip={`Purifying Brew removed <b>${formatNumber(this.totalPurified)}</b> damage in total over ${this.totalPurifies} casts.<br/>
-                  The smallest purify removed <b>${formatNumber(this.minPurify)}</b> and the largest purify removed <b>${formatNumber(this.maxPurify)}</b>.<br/>
-                  You purified <b>${this.badPurifies}</b> (${formatPercentage(this.badPurifies / this.totalPurifies)}%) times without reaching Heavy Stagger.<br/>
-                  Your purifies were delayed from the nearest peak by <b>${(this.avgPurifyDelay / 1000).toFixed(2)}s</b> on average.`}
+        tooltip={(
+          <>
+            Purifying Brew removed <strong>{formatNumber(this.totalPurified)}</strong> damage in total over {this.totalPurifies} casts.<br />
+            The smallest purify removed <strong>{formatNumber(this.minPurify)}</strong> and the largest purify removed <strong>{formatNumber(this.maxPurify)}</strong>.<br />
+            You purified <strong>{this.badPurifies}</strong> ({formatPercentage(this.badPurifies / this.totalPurifies)}%) times without reaching Heavy Stagger.<br />
+            Your purifies were delayed from the nearest peak by <strong>{(this.avgPurifyDelay / 1000).toFixed(2)}s</strong> on average.
+          </>
+        )}
       />
     );
   }

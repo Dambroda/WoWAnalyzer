@@ -1,9 +1,13 @@
 import React from 'react';
-import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
 import SPELLS from 'common/SPELLS';
 import SpellLink from 'common/SpellLink';
 import { encodeTargetString } from 'parser/shared/modules/EnemyInstances';
 import { STATISTIC_ORDER } from 'interface/others/StatisticsListBox';
+import { TooltipElement } from 'common/Tooltip';
+import { SELECTED_PLAYER } from 'parser/core/Analyzer';
+import Events from 'parser/core/Events';
+
+import getComboPointsFromEvent from '../core/getComboPointsFromEvent';
 import Snapshot from '../core/Snapshot';
 import ComboPointTracker from '../combopoints/ComboPointTracker';
 import { PANDEMIC_FRACTION, RIP_DURATION_1_CP, RIP_DURATION_PER_CP, RIP_MAXIMUM_EXTENDED_DURATION, SABERTOOTH_EXTEND_PER_CP } from '../../constants';
@@ -29,8 +33,8 @@ class RipSnapshot extends Snapshot {
     comboPointTracker: ComboPointTracker,
   };
 
-  static spellCastId = SPELLS.RIP.id;
-  static debuffId = SPELLS.RIP.id;
+  static spell = SPELLS.RIP;
+  static debuff = SPELLS.RIP;
   static durationOfFresh = null; // varies, see getDurationOfFresh()
   static isProwlAffected = false;
   static isTigersFuryAffected = true;
@@ -44,41 +48,27 @@ class RipSnapshot extends Snapshot {
 
   /**
    * Order of processed events when player casts rip is always:
-   *   on_byPlayer_cast
-   *   on_byPlayer_spendresource
-   *   on_byPlayer_debuffapply, or on_byPlayer_debuffrefresh
-   * So it's safe to store the comboLastRip on spendresource then use it to calculate the DoT duration.
+   *   cast
+   *   debuffapply or debuffrefresh
+   * So it's safe to store the comboLastRip on cast then use it to calculate the DoT duration in response to debuff apply/refresh.
    */
   comboLastRip = 0;
-  comboLastBite = 0;
 
   constructor(...args) {
     super(...args);
     if (this.selectedCombatant.hasTalent(SPELLS.SABERTOOTH_TALENT.id)) {
       this.constructor.hasSabertooth = true;
     }
+    this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(SPELLS.RIP), this._castRip);
+    this.addEventListener(Events.cast.by(SELECTED_PLAYER).spell(SPELLS.FEROCIOUS_BITE), this._castFerociousBite);
   }
 
-  on_byPlayer_cast(event) {
-    super.on_byPlayer_cast(event);
-    if (event.ability.guid === SPELLS.FEROCIOUS_BITE.id) {
-      debug && console.log(`${this.owner.formatTimestamp(event.timestamp)} bite cast.`);
-      this.handleBiteExtend(event);
-    }
+  _castRip(event) {
+    this.comboLastRip = getComboPointsFromEvent(event);
+    debug && this.log(`spend ${this.comboLastRip} combo points on Rip`);
   }
 
-  on_byPlayer_spendresource(event) {
-    if (event.ability.guid === SPELLS.RIP.id &&
-        event.resourceChangeType === RESOURCE_TYPES.COMBO_POINTS.id) {
-      this.comboLastRip = event.resourceChange;
-    }
-    if (event.ability.guid === SPELLS.FEROCIOUS_BITE.id &&
-        event.resourceChangeType === RESOURCE_TYPES.COMBO_POINTS.id) {
-      this.comboLastBite = event.resourceChange;
-    }
-  }
-
-  handleBiteExtend(event) {
+  _castFerociousBite(event) {
     if (!this.constructor.hasSabertooth) {
       // without sabertooth talent the duration doesn't get extended
       return;
@@ -90,12 +80,15 @@ class RipSnapshot extends Snapshot {
       return;
     }
 
+    // FIXME: If the ferocious bite is parried (or otherwise fails to hit) it will not extend rip, but that's not accounted for here.
+
     // Sabertooth extends duration depending on combo points used on Bite, but there's a limit to how far into the future Rip can be extended
+    const comboPoints = getComboPointsFromEvent(event);
     const remainingTime = existing.expireTime - event.timestamp;
-    const newDuration = Math.min(RIP_MAXIMUM_EXTENDED_DURATION, remainingTime + this.comboLastBite * SABERTOOTH_EXTEND_PER_CP);
+    const newDuration = Math.min(RIP_MAXIMUM_EXTENDED_DURATION, remainingTime + comboPoints * SABERTOOTH_EXTEND_PER_CP);
     existing.expireTime = event.timestamp + newDuration;
     existing.pandemicTime = event.timestamp + newDuration * (1.0 - PANDEMIC_FRACTION);
-    debug && console.log(`${this.owner.formatTimestamp(event.timestamp)} bite extended rip to ${this.owner.formatTimestamp(existing.expireTime)}`);
+    debug && this.log(`${comboPoints} combo bite extended rip to ${this.owner.formatTimestamp(existing.expireTime)}`);
   }
 
   checkRefreshRule(stateNew) {
@@ -105,7 +98,7 @@ class RipSnapshot extends Snapshot {
     }
     const event = stateNew.castEvent;
     if (!event) {
-      debug && console.warn('RipSnapshot checking refresh rule with a state that was never assigned a cast event.');
+      debug && this.warn('RipSnapshot checking refresh rule with a state that was never assigned a cast event.');
       return;
     }
 
@@ -117,7 +110,7 @@ class RipSnapshot extends Snapshot {
       const strengthComment = (stateOld.power > stateNew.power) ? 'a stronger' : 'the same strength';
       event.meta.inefficientCastReason = `Used Rip when you could have extended using Ferocious Bite and kept ${strengthComment} snapshot.`;
     }
-    
+
     if (stateOld.expireTime > (stateNew.expireTime - MAX_ALLOWED_DURATION_REDUCTION)) {
       // existing DoT would have lasted longer than the new one will, so would have been better off doing nothing at all
       const remainingOld = ((stateOld.expireTime - stateNew.startTime) / 1000).toFixed(1);
@@ -193,7 +186,7 @@ class RipSnapshot extends Snapshot {
     when(this.downgradeSuggestionThresholds).addSuggestion((suggest, actual, recommended) => {
       return suggest(
         <>
-          Try not to refresh <SpellLink id={SPELLS.RIP.id} /> before the <dfn data-tip={`The last ${(this.constructor.durationOfFresh * PANDEMIC_FRACTION / 1000).toFixed(1)} seconds of Rip's duration. When you refresh during this time you don't lose any duration in the process.`}>pandemic window</dfn> unless you have more powerful <dfn data-tip={"Applying Rip with Tiger's Fury or Bloodtalons will boost its damage until you reapply it."}>snapshot buffs</dfn> than were present when it was first cast.
+          Try not to refresh <SpellLink id={SPELLS.RIP.id} /> before the <TooltipElement content={`The last ${(this.constructor.durationOfFresh * PANDEMIC_FRACTION / 1000).toFixed(1)} seconds of Rip's duration. When you refresh during this time you don't lose any duration in the process.`}>pandemic window</TooltipElement> unless you have more powerful <TooltipElement content="Applying Rip with Tiger's Fury or Bloodtalons will boost its damage until you reapply it.">snapshot buffs</TooltipElement> than were present when it was first cast.
         </>
       )
         .icon(SPELLS.RIP.icon)
@@ -204,7 +197,7 @@ class RipSnapshot extends Snapshot {
     when(this.shouldBeBiteSuggestionThresholds).addSuggestion((suggest, actual, recommended) => {
       return suggest(
         <>
-          With <SpellLink id={SPELLS.SABERTOOTH_TALENT.id} /> you should use <SpellLink id={SPELLS.FEROCIOUS_BITE.id} /> to extend the duration of <SpellLink id={SPELLS.RIP.id} />. Only use <SpellLink id={SPELLS.RIP.id} /> when the bleed is missing or when you can improve the <dfn data-tip={"Applying Rip with Tiger's Fury or Bloodtalons will boost its damage until you reapply it. This boost is maintained when Bite extends the bleed."}>snapshot.</dfn>
+          With <SpellLink id={SPELLS.SABERTOOTH_TALENT.id} /> you should use <SpellLink id={SPELLS.FEROCIOUS_BITE.id} /> to extend the duration of <SpellLink id={SPELLS.RIP.id} />. Only use <SpellLink id={SPELLS.RIP.id} /> when the bleed is missing or when you can improve the <TooltipElement content="Applying Rip with Tiger's Fury or Bloodtalons will boost its damage until you reapply it. This boost is maintained when Bite extends the bleed.">snapshot.</TooltipElement>
         </>
       )
         .icon(SPELLS.RIP.icon)

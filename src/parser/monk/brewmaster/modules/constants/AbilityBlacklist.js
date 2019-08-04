@@ -5,6 +5,44 @@
  */
 
 const SHARED = [
+  // ETERNAL PALACE
+  // Sivara
+  302588, // Frost Mark
+  294856, // Unstable Mixture
+  300701, // Rimefrost
+  300705, // Septic Taint
+  302589, // Toxic Brand
+  // Behemoth
+  292138, // Radiant Biomass
+  // Ashvane
+  297333, // Briny Bubble -- can't ISB while stunned
+  296688, // Rippling Wave
+  296693, // Waterlogged
+  296752, // Cutting Coral
+  // Orgozoa
+  295161, // Pervasive Shock
+  // Za'qul
+  295537, // Mind Tether
+  292971, // Hysteria
+  // Queen Azshara
+  298782, // Arcane Orb
+  301425, // Controlled Burst
+  298756, // Serrated Edge
+  299276, // Sanction
+  298425, // Charged Spear
+  // CRUCIBLE OF STORMS
+  282743, // Cabal, Storm of Annihilation (Crown effect)
+  295479, // Uu'nat, Touch of the End
+  // BOD
+  288806, // Mekkatorque, Gigavolt Blast
+  286646, // Mekkatorque, Gigavolt Charge
+  289648, // Mekkatorque (Spark Bot), Spark Shield -- RJW causes a bunch of events for this. not much you can do to avoid it
+  288939, // Mekkatorque, Gigavolt Radiation
+  284831, // Rastakhan, Scorching Detonation -- DoT
+  285195, // Rastakhan, Deadly Withering
+  285000, // Stormwall, Kelp-Wrapped
+  287993, // Jaina, Chilling Touch
+  287490, // Jaina, Frozen Solid
   // ULDIR
   266948, // Vectis, Plague Bomb (intermission soak)
   // ANTORUS

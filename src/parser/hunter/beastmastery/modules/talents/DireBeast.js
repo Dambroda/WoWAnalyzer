@@ -42,7 +42,6 @@ class DireBeast extends Analyzer {
     if (spellId !== SPELLS.DIRE_BEAST_GENERATOR.id) {
       return;
     }
-    console.log(event.waste);
     if (!this.hasSoB) {
       this.focusGained += event.resourceChange - event.waste;
       this.focusWasted += event.waste;
@@ -78,15 +77,19 @@ class DireBeast extends Analyzer {
     return (
       <TalentStatisticBox
         talent={SPELLS.DIRE_BEAST_TALENT.id}
-        value={
+        value={(
+<>
+          <ItemDamageDone amount={this.damage} /> <br />
+          gained {formatPercentage(HASTE_PERCENT * this.uptime)}% Haste <br />
+          gained {this.focusGained} Focus <ResourceIcon id={RESOURCE_TYPES.FOCUS.id} />
+        </>
+)}
+        tooltip={(
           <>
-            <ItemDamageDone amount={this.damage} /> <br />
-            gained {formatPercentage(HASTE_PERCENT * this.uptime)}% haste <br />
-            gained {this.focusGained} focus <ResourceIcon id={RESOURCE_TYPES.FOCUS.id} />
-          </>}
-        tooltip={`
-            You had ${formatPercentage(this.uptime)}% uptime on the Dire Beast haste buff. <br />
-            You wasted ${this.focusWasted} focus by being too close to focus cap when Dire Beast gave you focus.`}
+            You had {formatPercentage(this.uptime)}% uptime on the Dire Beast Haste buff. <br />
+            You wasted {this.focusWasted} Focus by being too close to Focus cap when Dire Beast gave you Focus.
+          </>
+        )}
       />
     );
   }

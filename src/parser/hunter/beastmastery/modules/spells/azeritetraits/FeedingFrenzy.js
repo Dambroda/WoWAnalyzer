@@ -53,7 +53,7 @@ class FeedingFrenzy extends Analyzer {
     debug && console.log(`feeding frenzy bonus from items: ${this.traitBonus}`);
   }
 
-  extra_BS_uptime(timestamp, lastCast) {
+  extraBSUptime(timestamp, lastCast) {
     const delta = timestamp - lastCast;
     if (delta > (ORIGINAL_FRENZY_DURATION)) {
       const ret = Math.min(delta - (ORIGINAL_FRENZY_DURATION), MS);
@@ -93,7 +93,7 @@ class FeedingFrenzy extends Analyzer {
     if (!this.hasFrenzyUp || event.timestamp < this.buffApplication + MS_BUFFER) {
       return;
     }
-    this.extraBuffUptime += this.extra_BS_uptime(event.timestamp, this.lastBSCast);
+    this.extraBuffUptime += this.extraBSUptime(event.timestamp, this.lastBSCast);
     this.lastBSCast = event.timestamp;
   }
 
@@ -126,7 +126,7 @@ class FeedingFrenzy extends Analyzer {
 
   on_fightend() {
     if (this.lastBSCast !== null) {
-      this.extraBuffUptime += this.extra_BS_uptime(this.owner.fight.end_time, this.lastBSCast);
+      this.extraBuffUptime += this.extraBSUptime(this.owner.fight.end_time, this.lastBSCast);
     }
   }
 
@@ -144,15 +144,18 @@ class FeedingFrenzy extends Analyzer {
             {formatPercentage(damageThroughputPercent)} % / {formatNumber(dps)} DPS
           </>
         )}
-        tooltip={`This only accounts for the added uptime granted when casting Barbed Shot after 8 seconds had passed, so each cast can potentially be worth up to 1 second. <br/>
-                  This happened a total of ${this.timesExtended} ${this.timesExtended > 1 ? 'times' : 'time'}.
-                  <ul>
-                  <li>This means that you gained an average extra uptime of ${(this.extraBuffUptime / this.timesExtended / 1000).toFixed(2)}s per cast of Barbed Shot that was cast more than 8 seconds after the last one.</li>
-                  <li>Out of all your Barbed Shot casts, you gained an extra ${(this.extraBuffUptime / this.casts / 1000).toFixed(2)}s of uptime per cast.</li>
-                  </ul>
-                  <br />
-                  The damage portion of this trait did an additional ~ ${formatNumber(dps)} DPS, ${formatPercentage(damageThroughputPercent)} % of your overall damage.
-`}
+        tooltip={(
+          <>
+            This only accounts for the added uptime granted when casting Barbed Shot after 8 seconds had passed, so each cast can potentially be worth up to 1 second. <br />
+            This happened a total of {this.timesExtended} {this.timesExtended > 1 ? 'times' : 'time'}.
+            <ul>
+              <li>This means that you gained an average extra uptime of {(this.extraBuffUptime / this.timesExtended / 1000).toFixed(2)}s per cast of Barbed Shot that was cast more than 8 seconds after the last one.</li>
+              <li>Out of all your Barbed Shot casts, you gained an extra {(this.extraBuffUptime / this.casts / 1000).toFixed(2)}s of uptime per cast.</li>
+            </ul>
+            <br />
+            The damage portion of this trait did an additional ~ {formatNumber(dps)} DPS, {formatPercentage(damageThroughputPercent)} % of your overall damage.
+          </>
+        )}
       />
     );
   }

@@ -31,6 +31,7 @@ class Abilities extends CoreAbilities {
           static: 1000,
         },
         timelineSortIndex: 5,
+        primaryCoefficient: 0.125, // damage per tick
       },
       {
         spell: SPELLS.FEROCIOUS_BITE,
@@ -42,7 +43,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.SAVAGE_ROAR_TALENT,
-        buffSpellId: SPELLS.SAVAGE_ROAR_TALENT.id,
         category: Abilities.SPELL_CATEGORIES.ROTATIONAL,
         enabled: combatant.hasTalent(SPELLS.SAVAGE_ROAR_TALENT.id),
         gcd: {
@@ -69,6 +69,15 @@ class Abilities extends CoreAbilities {
         },
         timelineSortIndex: 10,
         primaryCoefficient: 0.055, // initial damage, not DoT damage
+      },
+      {
+        spell: SPELLS.PRIMAL_WRATH_TALENT,
+        category: Abilities.SPELL_CATEGORIES.ROTATIONAL_AOE,
+        enabled: combatant.hasTalent(SPELLS.PRIMAL_WRATH_TALENT.id),
+        gcd: {
+          static: 1000,
+        },
+        timelineSortIndex: 5,
       },
       {
         spell: SPELLS.SWIPE_CAT,
@@ -108,7 +117,6 @@ class Abilities extends CoreAbilities {
 
       {
         spell: SPELLS.INCARNATION_KING_OF_THE_JUNGLE_TALENT,
-        buffSpellId: SPELLS.INCARNATION_KING_OF_THE_JUNGLE_TALENT.id,
         category: Abilities.SPELL_CATEGORIES.COOLDOWNS,
         cooldown: 180,
         enabled: combatant.hasTalent(SPELLS.INCARNATION_KING_OF_THE_JUNGLE_TALENT.id),
@@ -124,7 +132,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.BERSERK,
-        buffSpellId: SPELLS.BERSERK.id,
         category: Abilities.SPELL_CATEGORIES.COOLDOWNS,
         cooldown: 180,
         enabled: !combatant.hasTalent(SPELLS.INCARNATION_KING_OF_THE_JUNGLE_TALENT.id),
@@ -139,7 +146,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.TIGERS_FURY,
-        buffSpellId: SPELLS.TIGERS_FURY.id,
         category: Abilities.SPELL_CATEGORIES.COOLDOWNS,
         cooldown: 30,
         castEfficiency: {
@@ -187,10 +193,10 @@ class Abilities extends CoreAbilities {
           static: 1000,
         },
         timelineSortIndex: 32,
+        primaryCoefficient: 0.092, // damage per combo point
       },
       {
         spell: SPELLS.DASH,
-        buffSpellId: SPELLS.DASH.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         enabled: !combatant.hasTalent(SPELLS.TIGER_DASH_TALENT.id),
         cooldown: 120,
@@ -208,7 +214,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.TIGER_DASH_TALENT,
-        buffSpellId: SPELLS.TIGER_DASH_TALENT.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         enabled: combatant.hasTalent(SPELLS.TIGER_DASH_TALENT.id),
         cooldown: 45,
@@ -226,8 +231,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: [SPELLS.STAMPEDING_ROAR_HUMANOID, SPELLS.STAMPEDING_ROAR_CAT, SPELLS.STAMPEDING_ROAR_BEAR],
-        // buffSpellId should match the version that was cast
-        buffSpellId: SPELLS.STAMPEDING_ROAR_CAT.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         cooldown: 120,
         gcd: (combatant => {
@@ -256,23 +259,14 @@ class Abilities extends CoreAbilities {
         timelineSortIndex: 33,
       },
       {
-        spell: SPELLS.PROWL,
-        buffSpellId: SPELLS.PROWL.id,
+        spell: [SPELLS.PROWL, SPELLS.PROWL_INCARNATION],
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         // 6 second cooldown, but triggered by leaving stealth not by using Prowl.
         gcd: null,
         timelineSortIndex: 25,
       },
       {
-        spell: SPELLS.PROWL_INCARNATION,
-        buffSpellId: SPELLS.PROWL_INCARNATION.id,
-        category: Abilities.SPELL_CATEGORIES.UTILITY,
-        gcd: null,
-        timelineSortIndex: 26,
-      },
-      {
         spell: SPELLS.SHADOWMELD,
-        buffSpellId: SPELLS.SHADOWMELD.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         cooldown: 120,
         isUndetectable: true,
@@ -281,7 +275,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.SURVIVAL_INSTINCTS,
-        buffSpellId: SPELLS.SURVIVAL_INSTINCTS.id,
         category: Abilities.SPELL_CATEGORIES.DEFENSIVE,
         cooldown: 120,
         charges: 2,
@@ -364,7 +357,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.BEAR_FORM,
-        buffSpellId: SPELLS.BEAR_FORM.id,
         category: Abilities.SPELL_CATEGORIES.DEFENSIVE,
         gcd: {
           base: 1500,
@@ -374,7 +366,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.CAT_FORM,
-        buffSpellId: SPELLS.CAT_FORM.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         gcd: {
           base: 1500,
@@ -383,7 +374,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.MOONKIN_FORM_AFFINITY,
-        buffSpellId: SPELLS.MOONKIN_FORM_AFFINITY.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         // only has a cooldown for feral spec
         cooldown: 90,
@@ -395,7 +385,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.TRAVEL_FORM,
-        buffSpellId: SPELLS.TRAVEL_FORM.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         gcd: {
           base: 1500,
@@ -404,7 +393,6 @@ class Abilities extends CoreAbilities {
       },
       {
         spell: SPELLS.STAG_FORM,
-        buffSpellId: SPELLS.STAG_FORM.id,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         gcd: {
           base: 1500,

@@ -170,6 +170,7 @@ class Abilities extends CoreAbilities {
         },
         healSpellIds: [
           SPELLS.ASCENDANCE_HEAL.id,
+          SPELLS.ASCENDANCE_INITIAL_HEAL.id,
         ],
       },
       {
@@ -389,6 +390,7 @@ class Abilities extends CoreAbilities {
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         timelineSortIndex: 80,
         cooldown: 12,
+        gcd: null,
       },
       {
         // had to remove SPELLS.HEX_SKELETAL since the Blizzard API doesn't think it exists, causing issues. Please add it again if it's encountered in a log, and if so leave a comment with the log

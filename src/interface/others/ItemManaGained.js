@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ResourceIcon from 'common/ResourceIcon';
-import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
+import ManaIcon from 'interface/icons/Mana';
+import { formatThousands } from 'common/format';
 
 class ItemManaGained extends React.PureComponent {
   static propTypes = {
@@ -19,8 +19,8 @@ class ItemManaGained extends React.PureComponent {
 
     return (
       <>
-        <ResourceIcon id={RESOURCE_TYPES.MANA.id} />{' '}
-        {approximate && '≈'}{parser.formatManaRestored(amount)}
+        <ManaIcon />{' '}
+        {approximate && '≈'}{formatThousands(amount / parser.fightDuration * 1000 * 5)} MP5 <small>{formatThousands(amount)} total mana</small>
       </>
     );
   }

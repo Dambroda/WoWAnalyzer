@@ -1,9 +1,9 @@
 import React from 'react';
 
-import BaseChecklist from 'parser/shared/modules/features/Checklist2/Module';
+import BaseChecklist from 'parser/shared/modules/features/Checklist/Module';
 import CastEfficiency from 'parser/shared/modules/CastEfficiency';
 import Combatants from 'parser/shared/modules/Combatants';
-import PreparationRuleAnalyzer from 'parser/shared/modules/features/Checklist2/PreparationRuleAnalyzer';
+import PreparationRuleAnalyzer from 'parser/shared/modules/features/Checklist/PreparationRuleAnalyzer';
 
 import Component from './Component';
 import RakeUptime from '../../bleeds/RakeUptime';
@@ -22,6 +22,7 @@ import Bloodtalons from '../../talents/Bloodtalons';
 import Predator from '../../talents/Predator';
 import TigersFuryEnergy from '../../spells/TigersFuryEnergy';
 import Shadowmeld from '../../racials/Shadowmeld';
+import FinisherUse from '../../combopoints/FinisherUse';
 
 class Checklist extends BaseChecklist {
   static dependencies = {
@@ -45,6 +46,7 @@ class Checklist extends BaseChecklist {
     predator: Predator,
     tigersFuryEnergy: TigersFuryEnergy,
     shadowmeld: Shadowmeld,
+    finisherUse: FinisherUse,
   };
 
   render() {
@@ -55,7 +57,7 @@ class Checklist extends BaseChecklist {
         thresholds={{
           // be prepared
           ...this.preparationRuleAnalyzer.thresholds,
-          
+
           // builders
           rakeUptime: this.rakeUptime.suggestionThresholds,
           moonfireUptime: this.moonfireUptime.suggestionThresholds,
@@ -68,8 +70,8 @@ class Checklist extends BaseChecklist {
           ferociousBiteEnergy: this.ferociousBiteEnergy.suggestionThresholds,
           ripShouldBeBite: this.ripSnapshot.shouldBeBiteSuggestionThresholds,
           ripDurationReduction: this.ripSnapshot.durationReductionThresholds,
-          finishersBelowFull: this.comboPointDetails.finishersBelowMaxSuggestionThresholds,
-          
+          badLowComboFinishers: this.finisherUse.badFinishersThresholds,
+
           // energy
           energyCapped: this.energyCapTracker.suggestionThresholds,
           tigersFuryIgnoreEnergy: this.tigersFuryEnergy.shouldIgnoreEnergyWaste,

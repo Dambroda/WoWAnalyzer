@@ -1,11 +1,11 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import Abilities from './modules/features/Abilities';
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import Channeling from './modules/features/Channeling';
 import Checklist from './modules/Checklist/Module';
+import Buffs from './modules/features/Buffs';
 
 import Mana from './modules/ManaChart/Mana';
 import ManaValues from './modules/ManaChart/ManaValues';
@@ -27,8 +27,6 @@ import ArcaneOrb from './modules/features/ArcaneOrb';
 import RuleOfThrees from './modules/features/RuleOfThrees';
 import TimeAnomaly from './modules/features/TimeAnomaly';
 
-
-
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     //Normalizers
@@ -37,10 +35,10 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Features
     checklist: Checklist,
+    buffs: Buffs,
     alwaysBeCasting: AlwaysBeCasting,
     abilities: Abilities,
     cooldownThroughputTracker: CooldownThroughputTracker,
-    damageDone: [DamageDone, { showStatistic: true }],
     channeling: Channeling,
     mana: Mana,
     manaValues: ManaValues,

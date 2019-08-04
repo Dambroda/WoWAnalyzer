@@ -1,46 +1,67 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 
 import Abilities from './modules/Abilities';
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
+import Buffs from './modules/Buffs';
 import SpellUsable from '../shared/SpellUsable';
 
 import ComboPointDetails from '../shared/resources/ComboPointDetails';
-import ComboPointTracker from '../shared/resources/ComboPointTracker';
+import OutlawComboPointTracker from './modules/core/OutlawComboPointTracker';
 import ComboPoints from './modules/core/ComboPoints';
 import EnergyDetails from '../shared/resources/EnergyDetails';
 import EnergyTracker from '../shared/resources/EnergyTracker';
-import EnergyCapTracker from '../shared/resources/EnergyCapTracker';
+import OutlawEnergyCapTracker from './modules/core/OutlawEnergyCapTracker';
 import Energy from './modules/core/Energy';
 import SpellEnergyCost from '../shared/resources/SpellEnergyCost';
 
+import RollTheBonesBuffs from './modules/spells/RollTheBonesBuffs';
+import RollTheBonesCastTracker from './modules/features/RollTheBonesCastTracker';
+import RollTheBonesCounter from './modules/spells/RollTheBonesCounter';
+import RollTheBonesEfficiency from './modules/spells/RollTheBonesEfficiency';
 import RestlessBlades from './modules/core/RestlessBlades';
 import SliceAndDiceUptime from './modules/talents/SliceAndDiceUptime';
+import Dispatch from './modules/spells/Dispatch';
+import Opportunity from './modules/spells/Opportunity';
+import OpportunityDamageTracker from './modules/spells/OpportunityDamageTracker';
+import BetweenTheEyes from './modules/spells/BetweenTheEyes';
+import BetweenTheEyesDamageTracker from './modules/spells/BetweenTheEyesDamageTracker';
+import Finishers from './modules/features/Finishers';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     //Feature
-    damageDone: [DamageDone, { showStatistic: true }],
     abilities: Abilities,
     alwaysBeCasting: AlwaysBeCasting,
+    buffs: Buffs,
     spellUsable: SpellUsable,
 
     //Resource
-    comboPointTracker: ComboPointTracker,
+    comboPointTracker: OutlawComboPointTracker,
     comboPointDetails: ComboPointDetails,
     comboPoints: ComboPoints,
     energyTracker: EnergyTracker,
-    energyCapTracker: EnergyCapTracker,
+    energyCapTracker: OutlawEnergyCapTracker,
     energyDetails: EnergyDetails,
     energy: Energy,
     spellEnergyCost: SpellEnergyCost,
 
     //Core
-    restlessBlades: RestlessBlades,
+    restlessBlades: RestlessBlades,    
+    rollTheBonesCastTracker: RollTheBonesCastTracker,
+    
     //Items
 
     //Casts
+    dispatch: Dispatch,
+    opportunityDamageTracker: OpportunityDamageTracker,
+    opportunity: Opportunity,
+    betweenTheEyesDamageTracker: BetweenTheEyesDamageTracker,
+    betweenTheEyes: BetweenTheEyes,
+    rollTheBonesBuffs: RollTheBonesBuffs,
+    rollTheBonesCounter: RollTheBonesCounter,
+    rollTheBonesEfficiency: RollTheBonesEfficiency,
+    finishers: Finishers,
 
     //Talents
     sliceAndDiceUptime: SliceAndDiceUptime,

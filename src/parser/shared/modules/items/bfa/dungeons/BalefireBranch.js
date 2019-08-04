@@ -1,9 +1,12 @@
 import React from 'react';
-import SPELLS from 'common/SPELLS/index';
-import ITEMS from 'common/ITEMS/index';
-import { formatDuration } from 'common/format';
-import { calculatePrimaryStat } from 'common/stats';
 
+import SPELLS from 'common/SPELLS';
+import ITEMS from 'common/ITEMS';
+import { formatDuration, formatNumber } from 'common/format';
+import { calculatePrimaryStat } from 'common/stats';
+import ItemStatistic from 'interface/statistics/ItemStatistic';
+import BoringItemValueText from 'interface/statistics/components/BoringItemValueText';
+import IntellectIcon from 'interface/icons/Intellect';
 import Analyzer from 'parser/core/Analyzer';
 import EventEmitter from 'parser/core/modules/EventEmitter';
 import Abilities from 'parser/core/modules/Abilities';
@@ -32,6 +35,8 @@ const BASE_INTELLECT_PER_STACK = 12;
  *
  * The initial buff shows in the log (and changebuffstack fabricated events) as a "1 stack" buff.
  * The log shows the correct stack count once it has been lowered from that initial value.
+ * 
+ * Test Log: /report/ABH7D8W1Qaqv96mt/2-Mythic+Taloc+-+Kill+(4:12)/Bjørgx/statistics
  */
 class BalefireBranch extends Analyzer {
   static dependencies = {
@@ -40,6 +45,7 @@ class BalefireBranch extends Analyzer {
     spellUsable: SpellUsable,
   };
 
+  _item = null;
   applyCount = 0;
   currentStack = 0;
   totalUptime = 0;
@@ -58,10 +64,11 @@ class BalefireBranch extends Analyzer {
 
   constructor(...args) {
     super(...args);
-    this.active = this.selectedCombatant.hasTrinket(ITEMS.BALEFIRE_BRANCH.id);
+    this._item = this.selectedCombatant.getTrinket(ITEMS.BALEFIRE_BRANCH.id);
+    this.active = !!this._item;
 
     if (this.active) {
-      const itemLevel = this.selectedCombatant.getItem(ITEMS.BALEFIRE_BRANCH.id).itemLevel;
+      const itemLevel = this._item.itemLevel;
       this.intellectPerStack = calculatePrimaryStat(BASE_ITEM_LEVEL, BASE_INTELLECT_PER_STACK, itemLevel);
 
       // remind the player to activate the trinket
@@ -109,14 +116,12 @@ class BalefireBranch extends Analyzer {
       type: 'applybuffstack',
     });
   }
-
   on_toPlayer_removebuffstack(event) {
     if (SPELLS.KINDLED_SOUL.id !== event.ability.guid) {
       return;
     }
     this.stackChange(event.stack, event.timestamp);
   }
-
   on_toPlayer_removebuff(event) {
     if (SPELLS.KINDLED_SOUL.id !== event.ability.guid) {
       return;
@@ -124,7 +129,6 @@ class BalefireBranch extends Analyzer {
     this.stackChange(0, event.timestamp);
     this.totalUptime += (event.timestamp - this.lastApply);
   }
-
   on_fightend() {
     if (!this.lastChange || !this.currentStack) {
       return;
@@ -163,18 +167,25 @@ class BalefireBranch extends Analyzer {
     return this.intellectPerStack * (this.sumStacks / (this.owner.fightDuration / 1000));
   }
 
-  item() {
+  statistic() {
     const expectedIntellectWithoutDamage = this.intellectPerStack * (this.expectedSumStacks / (this.owner.fightDuration / 1000));
-    return {
-      item: ITEMS.BALEFIRE_BRANCH,
-      result: (
-        <dfn data-tip={`Activated <b>${this.applyCount}</b> time${this.applyCount === 1 ? '' : 's'} of a possible <b>${this.possibleUseCount}</b>.<br/>
-          The buff was active for <b>${formatDuration(this.totalUptime / 1000)}</b>.<br/>
-          Average intellect reduced by <b>${(expectedIntellectWithoutDamage - this.averageIntellect).toFixed(1)}</b> due to damage taken while the buff was active.`}>
-          {this.averageIntellect.toFixed(1)} average intellect
-        </dfn>
-      ),
-    };
+
+    return (
+      <ItemStatistic
+        size="flexible"
+        tooltip={(
+          <>
+            Activated <strong>{this.applyCount}</strong> time{this.applyCount === 1 ? '' : 's'} of a possible <strong>{this.possibleUseCount}</strong>. <br />
+            The buff was active for <strong>{formatDuration(this.totalUptime / 1000)}</strong>. <br />
+            Average Intellect reduced by <strong>{(expectedIntellectWithoutDamage - this.averageIntellect).toFixed(1)}</strong> due to damage taken while the buff was active.
+          </>
+        )}
+      >
+        <BoringItemValueText item={ITEMS.BALEFIRE_BRANCH}>
+          <IntellectIcon /> {formatNumber(this.averageIntellect)} <small>average Intellect gained</small>
+        </BoringItemValueText>
+      </ItemStatistic>
+    );
   }
 }
 

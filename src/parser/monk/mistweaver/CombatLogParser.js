@@ -6,15 +6,11 @@
  * Vivify or REM - Missed Vivify healing from less than 2 REMs out
  * Azerite Bonus Placeholders
  */
-
-import React from 'react';
-
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 
-import Tab from 'interface/others/Tab';
-import MonkSpreadsheet from 'interface/others/MonkSpreadsheet';
 import LowHealthHealing from 'parser/shared/modules/features/LowHealthHealing';
-import HealingDone from 'parser/shared/modules/HealingDone';
+import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
+import ManaUsageChart from 'parser/shared/modules/resources/mana/ManaUsageChart';
 
 import GlobalCooldown from './modules/core/GlobalCooldown';
 import CoreChanneling from './modules/core/Channeling';
@@ -34,6 +30,7 @@ import Checklist from './modules/features/Checklist/Module';
 import StatValues from './modules/features/StatValues';
 import EvmVivCastRatio from './modules/features/EvmVivCastRatio';
 import MasteryStats from './modules/features/MasteryStats';
+import Buffs from './modules/features/Buffs';
 
 // Spells
 import ThunderFocusTea from './modules/spells/ThunderFocusTea';
@@ -42,7 +39,7 @@ import EnvelopingMists from './modules/spells/EnvelopingMists';
 import SoothingMist from './modules/spells/SoothingMist';
 import Vivify from './modules/spells/Vivify';
 import LifeCocoon from './modules/spells/LifeCocoon';
-import AzeriteTraits from './modules/spells/AzeriteTraits';
+import SpinningCraneKick from './modules/spells/SpinningCraneKick';
 import RenewingMist from './modules/spells/RenewingMist';
 
 // Talents
@@ -59,6 +56,10 @@ import RenewingMistDuringManaTea from './modules/talents/RenewingMistDuringManaT
 // Azerite Traits
 import FontOfLife from './modules/spells/azeritetraits/FontOfLife';
 import UpliftedSpirits from './modules/spells/azeritetraits/UpliftedSpirits';
+import SecretInfusion from './modules/spells/azeritetraits/SecretInfusion';
+
+//essences
+import WayOfTheCrane from './modules/spells/essences/WayOfTheCrane';
 
 // Mana Tracker
 import MistweaverHealingEfficiencyDetails from './modules/features/MistweaverHealingEfficiencyDetails';
@@ -67,6 +68,7 @@ import HealingEfficiencyTracker from './modules/features/MistweaverHealingEffici
 import ManaTracker from '../../core/healingEfficiency/ManaTracker';
 
 import { ABILITIES_AFFECTED_BY_HEALING_INCREASES } from './constants';
+
 
 class CombatLogParser extends CoreCombatLogParser {
   static abilitiesAffectedByHealingIncreases = ABILITIES_AFFECTED_BY_HEALING_INCREASES;
@@ -78,11 +80,14 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Core
     lowHealthHealing: LowHealthHealing,
-    healingDone: [HealingDone, { showStatistic: true }],
     channeling: CoreChanneling,
     globalCooldown: GlobalCooldown,
     hotTracker: HotTracker,
     spellUsable: SpellUsable,
+
+    // Generic healer things
+    manaLevelChart: ManaLevelChart,
+    manaUsageChart: ManaUsageChart,
 
     // Features
     alwaysBeCasting: AlwaysBeCasting,
@@ -93,16 +98,17 @@ class CombatLogParser extends CoreCombatLogParser {
     statValues: StatValues,
     evmVivCastRatio: EvmVivCastRatio,
     masteryStats: MasteryStats,
+    buffs: Buffs,
 
     // Spells
     essenceFont: EssenceFont,
     thunderFocusTea: ThunderFocusTea,
     envelopingMists: EnvelopingMists,
     soothingMist: SoothingMist, // Removed as this needs to be reworked with updated Soothing Mist Spell in BfA
+    spinningCraneKick: SpinningCraneKick,
     vivify: Vivify,
     renewingMist: RenewingMist,
     lifeCocoon: LifeCocoon,
-    azeriteTraits: AzeriteTraits,
 
     // Talents
     chiBurst: ChiBurst,
@@ -118,30 +124,16 @@ class CombatLogParser extends CoreCombatLogParser {
     // Azerite Traits
     fontOfLife: FontOfLife,
     upliftedSpirits: UpliftedSpirits,
+    secretInfusion: SecretInfusion,
 
     // Mana Tab
     manaTracker: ManaTracker,
     hpmDetails: MistweaverHealingEfficiencyDetails,
     hpmTracker: HealingEfficiencyTracker,
+
+    //Essences
+    wayOfTheCrane: WayOfTheCrane,
   };
-
-  generateResults(...args) {
-    const results = super.generateResults(...args);
-
-    results.tabs = [
-      ...results.tabs,
-      {
-        title: 'Player Log Data',
-        url: 'player-log-data',
-        render: () => (
-          <Tab style={{ padding: '15px 22px 15px 15px' }}>
-            <MonkSpreadsheet parser={this} />
-          </Tab>
-        ),
-      },
-    ];
-    return results;
-  }
 }
 
 export default CombatLogParser;

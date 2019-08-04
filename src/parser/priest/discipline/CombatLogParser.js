@@ -1,6 +1,7 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import LowHealthHealing from 'parser/shared/modules/features/LowHealthHealing';
-import HealingDone from 'parser/shared/modules/HealingDone';
+import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
+import ManaUsageChart from 'parser/shared/modules/resources/mana/ManaUsageChart';
 
 import AtonementSuccessiveDamageNormalizer from './normalizers/AtonementSuccessiveDamage';
 import ShadowfiendNormalizer from '../shared/normalizers/ShadowfiendNormalizer';
@@ -35,6 +36,7 @@ import Contrition from './modules/spells/Contrition';
 import Grace from './modules/spells/Grace';
 import Schism from './modules/spells/Schism';
 
+import DeathThroes from './modules/azeritetraits/DeathThroes';
 import DepthOfTheShadows from './modules/azeritetraits/DepthOfTheShadows';
 import SinsOfTheMany from './modules/spells/SinsOfTheMany';
 
@@ -49,7 +51,6 @@ class CombatLogParser extends CoreCombatLogParser {
     shadowfiendNormalizer: ShadowfiendNormalizer,
     powerWordRadianceNormalizer: PowerWordRadianceNormalizer,
 
-    healingDone: [HealingDone, { showStatistic: true }],
     spellUsable: SpellUsable,
     spellManaCost: SpellManaCost,
     abilityTracker: AbilityTracker,
@@ -57,6 +58,10 @@ class CombatLogParser extends CoreCombatLogParser {
     abilities: Abilities,
     channeling: Channeling,
     globalCooldown: GlobalCooldown,
+
+    // Generic healer things
+    manaLevelChart: ManaLevelChart,
+    manaUsageChart: ManaUsageChart,
 
     // Features
     checklist: Checklist,
@@ -87,6 +92,7 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Azerite Traits
     depthOfTheShadows: DepthOfTheShadows,
+    deathThroes: DeathThroes,
   };
 }
 

@@ -1,6 +1,5 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 import Abilities from './modules/Abilities';
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
@@ -26,6 +25,7 @@ import SpellEnergyCost from '../shared/resources/SpellEnergyCost';
 import EnvenomUptime from './modules/spells/EnvenomUptime';
 import GarroteUptime from './modules/spells/GarroteUptime';
 import RuptureUptime from './modules/spells/RuptureUptime';
+import EarlyDotRefresh from './modules/spells/EarlyDotRefresh';
 
 import GarroteSnapshot from './modules/features/GarroteSnapshot';
 import RuptureSnapshot from './modules/features/RuptureSnapshot';
@@ -51,7 +51,6 @@ class CombatLogParser extends CoreCombatLogParser {
     enemyHpTracker: EnemyHpTracker,
 
     //Feature
-    damageDone: [DamageDone, { showStatistic: true }],
     abilities: Abilities,
     alwaysBeCasting: AlwaysBeCasting,
     cooldownThroughputTracker: CooldownThroughputTracker,
@@ -72,6 +71,7 @@ class CombatLogParser extends CoreCombatLogParser {
     envenomUptime: EnvenomUptime,
     garroteUptime: GarroteUptime,
     ruptureUptime: RuptureUptime,
+    earlyDotRefresh: EarlyDotRefresh,
 
     garroteSnapshot: GarroteSnapshot,
     ruptureSnapshot: RuptureSnapshot,

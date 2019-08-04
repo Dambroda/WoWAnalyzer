@@ -1,5 +1,4 @@
 import MainCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import Haste from './modules/core/Haste';
 import GlobalCooldown from './modules/core/GlobalCooldown';
 
@@ -31,11 +30,15 @@ import Starlord from './modules/talents/Starlord';
 import AstralPowerDetails from './modules/resourcetracker/AstralPowerDetails';
 import AstralPowerTracker from './modules/resourcetracker/AstralPowerTracker';
 
+//azerite
+import DawningSun from './modules/talents/azeritetraits/DawningSun';
+import HighNoon from './modules/talents/azeritetraits/HighNoon';
+import PowerOfTheMoon from './modules/talents/azeritetraits/PowerOfTheMoon';
+
 //Items
 
 class CombatLogParser extends MainCombatLogParser {
   static specModules = {
-    damageDone: [DamageDone, { showStatistic: true }],
     haste: Haste,
     globalCooldown: GlobalCooldown,
 
@@ -68,6 +71,11 @@ class CombatLogParser extends MainCombatLogParser {
     astralPowerDetails: AstralPowerDetails,
 
     //Items
+
+    //azerite
+    dawningSun: DawningSun,
+    highNoon: HighNoon,
+    powerOfTheMoon: PowerOfTheMoon,
   };
 }
 

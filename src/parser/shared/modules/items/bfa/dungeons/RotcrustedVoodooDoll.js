@@ -1,6 +1,8 @@
 import React from 'react';
 import SPELLS from 'common/SPELLS';
 import ITEMS from 'common/ITEMS';
+import ItemStatistic from 'interface/statistics/ItemStatistic';
+import BoringItemValueText from 'interface/statistics/components/BoringItemValueText';
 import Analyzer from 'parser/core/Analyzer';
 import { formatNumber } from 'common/format';
 import ItemDamageDone from 'interface/others/ItemDamageDone';
@@ -10,9 +12,9 @@ const ACTIVATION_COOLDOWN = 120; // seconds
 
 /**
  * Rotcrusted Voodoo Doll
- * Use: Brandish the Voodoo Doll at your target, 
+ * Use: Brandish the Voodoo Doll at your target,
  * dealing X Shadow damage over 6 sec, and an additional X Shadow damage after 6 sec. (2 Min Cooldown)
- * 
+ *
  * Example log: /report/hYkG1MtKyxB8cPRZ/3-Heroic+Taloc+-+Kill+(3:49)/9-Qt/abilities
  */
 class RotcrustedVoodooDoll extends Analyzer {
@@ -50,15 +52,17 @@ class RotcrustedVoodooDoll extends Analyzer {
     this.ticks += 1;
   }
 
-  item() {
-    return {
-      item: ITEMS.ROTCRUSTED_VOODOO_DOLL,
-      result: (
-          <dfn data-tip={`<b>${this.ticks}</b> ticks, causing <b>${formatNumber(this.damage)}</b> damage.`}>
-            <ItemDamageDone amount={this.damage} />
-          </dfn>
-      ),
-    };
+  statistic() {
+    return (
+      <ItemStatistic
+        size="flexible"
+        tooltip={<><strong>{this.ticks}</strong> ticks, causing <strong>{formatNumber(this.damage)}</strong> damage.</>}
+      >
+        <BoringItemValueText item={ITEMS.ROTCRUSTED_VOODOO_DOLL}>
+          <ItemDamageDone amount={this.damage} />
+        </BoringItemValueText>
+      </ItemStatistic>
+    );
   }
 }
 

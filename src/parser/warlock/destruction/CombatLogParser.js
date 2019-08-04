@@ -1,5 +1,4 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 
 import SpellUsable from './modules/core/SpellUsable';
@@ -32,7 +31,6 @@ import GrimoireOfSupremacy from './modules/talents/GrimoireOfSupremacy';
 import GrimoireOfSacrifice from '../shared/modules/talents/GrimoireOfSacrifice';
 import SoulConduit from './modules/talents/SoulConduit';
 import ChannelDemonfire from './modules/talents/ChannelDemonfire';
-import Talents from './modules/talents';
 
 import RollingHavoc from './modules/azerite/RollingHavoc';
 import BurstingFlare from './modules/azerite/BurstingFlare';
@@ -48,7 +46,6 @@ class CombatLogParser extends CoreCombatLogParser {
     abilities: Abilities,
     alwaysBeCasting: AlwaysBeCasting,
     cooldownThroughputTracker: CooldownThroughputTracker,
-    damageDone: [DamageDone, { showStatistic: true }],
 
     // DoTs
     immolateUptime: ImmolateUptime,
@@ -79,7 +76,6 @@ class CombatLogParser extends CoreCombatLogParser {
     grimoireOfSacrifice: GrimoireOfSacrifice,
     soulConduit: SoulConduit,
     channelDemonfire: ChannelDemonfire,
-    talents: Talents,
 
     // Azerite traits
     burstingFlare: BurstingFlare,

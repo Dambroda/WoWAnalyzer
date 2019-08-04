@@ -1,39 +1,11 @@
 import SPECS from 'game/SPECS';
 import RACES from 'game/RACES';
+import TALENT_ROWS from 'game/TALENT_ROWS';
+import GEAR_SLOTS from 'game/GEAR_SLOTS';
 import traitIdMap from 'common/TraitIdMap';
 import SPELLS from 'common/SPELLS';
-
+import { findByBossId } from 'raids/index';
 import Entity from './Entity';
-
-export const TALENT_ROWS = {
-  LV15: 0,
-  LV30: 1,
-  LV45: 2,
-  LV60: 3,
-  LV75: 4,
-  LV90: 5,
-  LV100: 6,
-};
-export const GEAR_SLOTS = {
-  HEAD: 0,
-  NECK: 1,
-  SHOULDER: 2,
-  SHIRT: 3,
-  CHEST: 4,
-  WAIST: 5,
-  LEGS: 6,
-  FEET: 7,
-  WRISTS: 8,
-  HANDS: 9,
-  FINGER1: 10,
-  FINGER2: 11,
-  TRINKET1: 12,
-  TRINKET2: 13,
-  BACK: 14,
-  MAINHAND: 15,
-  OFFHAND: 16,
-  TABARD: 17,
-};
 
 class Combatant extends Entity {
   get id() {
@@ -49,14 +21,29 @@ class Combatant extends Entity {
     return SPECS[this.specId];
   }
   get race() {
-    return this.owner.characterProfile ? Object.values(RACES).find(race => race.id === this.owner.characterProfile.race) : null;
+    if (!this.owner.characterProfile) {
+      return null;
+    }
+    const raceId = this.owner.characterProfile.race;
+    let race = Object.values(RACES).find(race => race.id === raceId);
+    if (!this.owner.boss) {
+      return race;
+    }
+    const boss = findByBossId(this.owner.boss.id);
+    if (boss && boss.fight.raceTranslation) {
+      race = boss.fight.raceTranslation(race, this.spec);
+    }
+    return race;
+  }
+  get characterProfile() {
+    return this.owner.characterProfile;
   }
 
   _combatantInfo = null;
   constructor(parser, combatantInfo) {
     super(parser);
 
-    const playerInfo = parser.playersById[combatantInfo.sourceID];
+    const playerInfo = parser.players.find(player => player.id === combatantInfo.sourceID);
     this._combatantInfo = {
       // In super rare cases `playerInfo` can be undefined, not taking this into account would cause the log to be unparsable
       name: playerInfo && playerInfo.name,
@@ -65,6 +52,7 @@ class Combatant extends Entity {
 
     this._parseTalents(combatantInfo.talents);
     this._parseTraits(combatantInfo.artifact);
+    this._parseEssences(combatantInfo.heartOfAzeroth);
     this._parseGear(combatantInfo.gear);
     this._parsePrepullBuffs(combatantInfo.auras);
   }
@@ -128,6 +116,31 @@ class Combatant extends Entity {
   }
   traitRanks(spellId) {
     return this.traitsBySpellId[spellId];
+  }
+  // endregion
+
+  // region Essences
+  essencesByTraitID = {};
+  _parseEssences(essences) {
+    if(essences === undefined) {
+      return;
+    }
+    essences.forEach((essence) => {
+      if (!!this.essencesByTraitID[essence.traitID]) {
+        essence.isMajor = true;
+      }
+      this.essencesByTraitID[essence.traitID] = essence;
+      //essence = {icon:string, isMajor:bool, rank:int, slot:int, spellID:int, traitID:int}
+    });
+  }
+  hasEssence(traitId) {
+    return !!this.essencesByTraitID[traitId];
+  }
+  hasMajor(traitId) {
+    return this.essencesByTraitID[traitId].isMajor;
+  }
+  essenceRank(traitId) {
+    return this.essencesByTraitID[traitId] && this.essencesByTraitID[traitId].rank;
   }
   // endregion
 

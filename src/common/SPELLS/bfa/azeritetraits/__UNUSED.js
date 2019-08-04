@@ -79,11 +79,6 @@ export default {
     name: 'Bindings of Fate',
     icon: 'spell_holy_greaterheal',
   },
-  BLADE_IN_THE_SHADOWS: {
-    id: 275896,
-    name: 'Blade In The Shadows',
-    icon: 'ability_rogue_shadowstrike',
-  },
   BLAST_RADIUS: {
     id: 269387,
     name: 'Blast Radius',
@@ -129,11 +124,6 @@ export default {
     name: 'Breach',
     icon: 'ability_heroicleap',
   },
-  BRIGANDS_BLITZ: {
-    id: 277723,
-    name: 'Brigand\'s Blitz',
-    icon: 'spell_shadow_shadowworddominate',
-  },
   BULWARK_OF_LIGHT: {
     id: 272976,
     name: 'Bulwark of Light',
@@ -169,11 +159,6 @@ export default {
     name: 'Dawning Sun',
     icon: 'spell_arcane_starfire',
   },
-  DEADSHOT: {
-    id: 272936,
-    name: 'Deadshot',
-    icon: 'inv_weapon_rifle_01',
-  },
   DEAFENING_CRASH: {
     id: 272824,
     name: 'Deafening Crash',
@@ -208,11 +193,6 @@ export default {
     id: 275463,
     name: 'Divine Revelations',
     icon: 'ability_paladin_infusionoflight',
-  },
-  DOUBLE_DOSE: {
-    id: 273007,
-    name: 'Double Dose',
-    icon: 'ability_rogue_shadowstrikes',
   },
   ECHOING_HOWL: {
     id: 275917,
@@ -304,11 +284,6 @@ export default {
     name: 'Fortifying Auras',
     icon: 'spell_holy_auramastery',
   },
-  FURIOUS_GAZE: {
-    id: 273231,
-    name: 'Furious Gaze',
-    icon: 'ability_demonhunter_eyebeam',
-  },
   FURY_OF_THE_SANDS: {
     id: 263989,
     name: 'Fury of the Sands',
@@ -369,11 +344,6 @@ export default {
     name: 'Ignition Point',
     icon: 'spell_fire_flamebolt',
   },
-  IN_THE_RHYTHM: {
-    id: 264198,
-    name: 'In The Rhythm',
-    icon: 'ability_hunter_efficiency',
-  },
   INCREASE_VERSATILITY_5: {
     id: 55564,
     name: 'Increase Versatility 15',
@@ -403,11 +373,6 @@ export default {
     id: 270639,
     name: 'Invigorating Brew',
     icon: 'ability_monk_vivify',
-  },
-  IRON_JAWS: {
-    id: 276021,
-    name: 'Iron Jaws',
-    icon: 'ability_druid_mangle-tga',
   },
   ITEM__PROC_MASTERY: {
     id: 92322,
@@ -513,11 +478,6 @@ export default {
     id: 272970,
     name: 'Packed Ice',
     icon: 'spell_frost_frostblast',
-  },
-  PERFORATE: {
-    id: 277719,
-    name: 'Perforate',
-    icon: 'ability_backstab',
   },
   PERMEATING_GLOW: {
     id: 272783,
@@ -674,11 +634,6 @@ export default {
     name: 'Shellshock',
     icon: 'ability_hunter_pet_turtle',
   },
-  SNAKE_EYES: {
-    id: 275863,
-    name: 'Snake Eyes',
-    icon: 'ability_rogue_rollthebones',
-  },
   SOLITARY_REJUVENATION: {
     id: 274432,
     name: 'Solitary Rejuvenation',
@@ -804,11 +759,6 @@ export default {
     name: 'Trailing Embers',
     icon: 'spell_fire_fireball02',
   },
-  TWIST_THE_KNIFE: {
-    id: 273488,
-    name: 'Twist the Knife',
-    icon: 'ability_rogue_garrote',
-  },
   TWISTED_CLAWS: {
     id: 275906,
     name: 'Twisted Claws',
@@ -819,11 +769,7 @@ export default {
     name: 'Uncertainty',
     icon: 'trade_engineering',
   },
-  UNERRING_VISION: {
-    id: 274444,
-    name: 'Unerring Vision',
-    icon: 'ability_trueshot',
-  },
+
   UNSHACKLED_FEL: {
     id: 270648,
     name: 'Unshackled Fel',

@@ -32,6 +32,11 @@ class StatTracker extends Analyzer {
     [SPELLS.BATTLE_POTION_OF_INTELLECT.id]: { intellect: 900 },
     [SPELLS.BATTLE_POTION_OF_AGILITY.id]: { agility: 900 },
     [SPELLS.BATTLE_POTION_OF_STAMINA.id]: { stamina: 1100 },
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_STRENGTH.id]: { strength: 1215 }, // Superior Battle Potion of Strength
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_AGILITY.id]: { agility: 1215 }, // Superior Battle Potion of Agility
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_INTELLECT.id]: { intellect: 1215 }, // Superior Battle Potion of Intellect
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_STAMINA.id]: { stamina: 1485 }, // Superior Battle Potion of Stamina
+    [SPELLS.SUPERIOR_STEELSKIN_POTION.id]: { armor: 1215 }, // Superior Steelskin Potion
     // endregion
 
     // region Runes
@@ -47,6 +52,10 @@ class StatTracker extends Analyzer {
     [SPELLS.FLASK_OF_ENDLESS_FATHOMS.id]: { intellect: 238 },
     [SPELLS.FLASK_OF_THE_UNDERTOW.id]: { strength: 238 },
     [SPELLS.FLASK_OF_THE_VAST_HORIZON.id]: { stamina: 357 },
+    [SPELLS.GREATER_FLASK_OF_THE_CURRENTS.id]: { agility: 360 },
+    [SPELLS.GREATER_FLASK_OF_ENDLESS_FATHOMS.id]: { intellect: 360 },
+    [SPELLS.GREATER_FLASK_OF_THE_UNDERTOW.id]: { strength: 360 },
+    [SPELLS.GREATER_FLASK_OF_THE_VAST_HORIZON.id]: { stamina: 540 },
     // endregion
 
     //region Food
@@ -71,69 +80,30 @@ class StatTracker extends Analyzer {
     [SPELLS.GALLEY_BANQUET_STR.id]: { strength: 75 },
     [SPELLS.GALLEY_BANQUET_AGI.id]: { agility: 75 },
     [SPELLS.GALLEY_BANQUET_STA.id]: { stamina: 113 },
+    [SPELLS.WELL_FED_WILD_BERRY_BREAD.id]: { stamina: 113 },
     [SPELLS.BOUNTIFUL_CAPTAIN_FEAST_INT.id]: { intellect: 100 },
     [SPELLS.BOUNTIFUL_CAPTAIN_FEAST_STR.id]: { strength: 100 },
     [SPELLS.BOUNTIFUL_CAPTAIN_FEAST_AGI.id]: { agility: 100 },
     [SPELLS.BOUNTIFUL_CAPTAIN_FEAST_STA.id]: { stamina: 150 },
+    [SPELLS.FAMINE_EVALUATOR_AND_SNACK_TABLE_FEAST_INT.id]: { intellect: 131 },
+    [SPELLS.FAMINE_EVALUATOR_AND_SNACK_TABLE_FEAST_STR.id]: { strength: 131 },
+    [SPELLS.FAMINE_EVALUATOR_AND_SNACK_TABLE_FEAST_AGI.id]: { agility: 131 },
+    [SPELLS.FAMINE_EVALUATOR_AND_SNACK_TABLE_FEAST_STA.id]: { stamina: 198 },
+    [SPELLS.ABYSSAL_FRIED_RISSOLE.id]: { mastery: 93 },
+    [SPELLS.BIL_TONG.id]: { versatility: 93 },
+    [SPELLS.MECH_DOWELS_BIG_MECH.id]: { crit: 93 },
+    [SPELLS.BAKED_PORT_TATO.id]: { haste: 93 },
+    [SPELLS.FRAGRANT_KAKAVIA.id]: { stamina: 198 },
+    [SPELLS.BORALUS_BLOOD_SAUSAGE_AGI.id]: { agility: 85 },
+    [SPELLS.BORALUS_BLOOD_SAUSAGE_INT.id]: { intellect: 85 },
+    [SPELLS.BORALUS_BLOOD_SAUSAGE_STR.id]: { strength: 85 },
+    [SPELLS.WELL_FED_REAWAKENING_INT.id]: { intellect: 60 },
+    [SPELLS.WELL_FED_REAWAKENING_STR.id]: { strength: 60 },
+    [SPELLS.WELL_FED_REAWAKENING_AGI.id]: { agility: 60 },
+    [SPELLS.WELL_FED_SEASONED_STEAK_AND_POTATOES.id]: { stamina: 150 },
     //endregion
 
     // region Dungeon Trinkets
-    [SPELLS.SHADOWS_STRIKE.id]: {
-      itemId: ITEMS.DREADSTONE_OF_ENDLESS_SHADOWS.id,
-      crit: (_, item) => calculateSecondaryStatDefault(845, 3480, item.itemLevel),
-    },
-    [SPELLS.SHADOW_MASTER.id]: {
-      itemId: ITEMS.DREADSTONE_OF_ENDLESS_SHADOWS.id,
-      mastery: (_, item) => calculateSecondaryStatDefault(845, 3480, item.itemLevel),
-    },
-    [SPELLS.SWARMING_SHADOWS.id]: {
-      itemId: ITEMS.DREADSTONE_OF_ENDLESS_SHADOWS.id,
-      haste: (_, item) => calculateSecondaryStatDefault(845, 3480, item.itemLevel),
-    },
-    [SPELLS.QUITE_SATISFIED_VERSATILITY.id]: {
-      itemId: ITEMS.MAJORDOMOS_DINNER_BELL.id,
-      versatility: (_, item) => calculateSecondaryStatDefault(845, 5252, item.itemLevel),
-    },
-    [SPELLS.QUITE_SATISFIED_CRIT.id]: {
-      itemId: ITEMS.MAJORDOMOS_DINNER_BELL.id,
-      crit: (_, item) => calculateSecondaryStatDefault(845, 5252, item.itemLevel),
-    },
-    [SPELLS.QUITE_SATISFIED_HASTE.id]: {
-      itemId: ITEMS.MAJORDOMOS_DINNER_BELL.id,
-      haste: (_, item) => calculateSecondaryStatDefault(845, 5252, item.itemLevel),
-    },
-    [SPELLS.QUITE_SATISFIED_MASTERY.id]: {
-      itemId: ITEMS.MAJORDOMOS_DINNER_BELL.id,
-      mastery: (_, item) => calculateSecondaryStatDefault(845, 5252, item.itemLevel),
-    },
-    [SPELLS.HOWL_OF_INGVAR.id]: {
-      itemId: ITEMS.MEMENTO_OF_ANGERBODA.id,
-      crit: (_, item) => calculateSecondaryStatDefault(845, 4207, item.itemLevel),
-    },
-    [SPELLS.DIRGE_OF_ANGERBODA.id]: {
-      itemId: ITEMS.MEMENTO_OF_ANGERBODA.id,
-      mastery: (_, item) => calculateSecondaryStatDefault(845, 4207, item.itemLevel),
-    },
-    [SPELLS.WAIL_OF_SVALA.id]: {
-      itemId: ITEMS.MEMENTO_OF_ANGERBODA.id,
-      haste: (_, item) => calculateSecondaryStatDefault(845, 4207, item.itemLevel),
-    },
-    [SPELLS.DOWN_DRAFT.id]: {
-      itemId: ITEMS.NIGHTMARE_EGG_SHELL.id,
-      haste: (_, item) => calculateSecondaryStatDefault(845, 361, item.itemLevel),
-    },
-    [SPELLS.ACCELERATION.id]: {
-      itemId: ITEMS.CHRONO_SHARD.id,
-      haste: (_, item) => calculateSecondaryStatDefault(845, 5269, item.itemLevel),
-    },
-    [SPELLS.GREASE_THE_GEARS.id]: {
-      itemId: ITEMS.FELOILED_INFERNAL_MACHINE.id,
-      haste: (_, item) => calculateSecondaryStatDefault(845, 3074, item.itemLevel),
-    },
-    [SPELLS.VALARJARS_PATH.id]: {
-      itemId: ITEMS.HORN_OF_VALOR.id,
-      haste: (_, item) => calculatePrimaryStat(820, 2332, item.itemLevel),
-    },
 
     // BFA quests
     [SPELLS.DIEMETRADON_FRENZY.id]: {
@@ -152,57 +122,6 @@ class StatTracker extends Analyzer {
     },
 
     //endregion
-
-    // region Raid Trinkets
-    // Event weirdness makes it impossible to handle CotRT normally, it's handled instead by the CharmOfTheRisingTide module
-    //[SPELLS.RISING_TIDES.id]: {
-    //  itemId: ITEMS.CHARM_OF_THE_RISING_TIDE.id,
-    //  haste: (_, item) => calculateSecondaryStatDefault(900, 576, item.itemLevel),
-    //},
-    [SPELLS.ACCELERANDO.id]: {
-      itemId: ITEMS.ERRATIC_METRONOME.id,
-      haste: (_, item) => calculateSecondaryStatDefault(870, 657, item.itemLevel),
-    },
-    [SPELLS.SOLAR_INFUSION.id]: {
-      itemId: ITEMS.CHALICE_OF_MOONLIGHT.id,
-      crit: (_, item) => calculateSecondaryStatDefault(900, 3619, item.itemLevel),
-    },
-    [SPELLS.LUNAR_INFUSION.id]: {
-      itemId: ITEMS.CHALICE_OF_MOONLIGHT.id,
-      haste: (_, item) => calculateSecondaryStatDefault(900, 3619, item.itemLevel),
-    },
-    [SPELLS.TOME_OF_UNRAVELING_SANITY_BUFF.id]: {
-      itemId: ITEMS.TOME_OF_UNRAVELING_SANITY.id,
-      crit: (_, item) => calculateSecondaryStatDefault(910, 2756, item.itemLevel),
-    },
-    [SPELLS.BRUTALITY_OF_THE_LEGION.id]: {
-      itemId: ITEMS.ACRID_CATALYST_INJECTOR.id,
-      crit: (_, item) => calculateSecondaryStatDefault(955, 210, item.itemLevel),
-    },
-    [SPELLS.FERVOR_OF_THE_LEGION.id]: {
-      itemId: ITEMS.ACRID_CATALYST_INJECTOR.id,
-      haste: (_, item) => calculateSecondaryStatDefault(955, 210, item.itemLevel),
-    },
-    [SPELLS.MALICE_OF_THE_LEGION.id]: {
-      itemId: ITEMS.ACRID_CATALYST_INJECTOR.id,
-      mastery: (_, item) => calculateSecondaryStatDefault(955, 210, item.itemLevel),
-    },
-    [SPELLS.CYCLE_OF_THE_LEGION.id]: {
-      itemId: ITEMS.ACRID_CATALYST_INJECTOR.id,
-      crit: (_, item) => calculateSecondaryStatDefault(955, 2397, item.itemLevel),
-      haste: (_, item) => calculateSecondaryStatDefault(955, 2397, item.itemLevel),
-      mastery: (_, item) => calculateSecondaryStatDefault(955, 2397, item.itemLevel),
-    },
-    [SPELLS.RUSH_OF_KNOWLEDGE.id]: {
-      itemId: ITEMS.NORGANNONS_PROWESS.id,
-      intellect: (_, item) => calculatePrimaryStat(940, 11483, item.itemLevel),
-    },
-    // Khaz'goroth's Courage is handled in it's own module since all 4 stat buffs use the same ID.
-    //[SPELLS.KHAZGOROTHS_SHAPING.id]: {
-    //  itemId: ITEMS.KHAZGOROTHS_COURAGE.id,
-    //  haste: (_, item) => calculateSecondaryStatDefault(940, 4219, item.itemLevel),
-    //},
-    // endregion
 
     // region Misc
     [SPELLS.JACINS_RUSE.id]: { mastery: 136 },
@@ -223,7 +142,7 @@ class StatTracker extends Analyzer {
     // endregion
 
     // region Paladin
-    [SPELLS.SERAPHIM_TALENT.id]: { crit: 249, haste: 249, mastery: 249, versatility: 249 },
+    [SPELLS.SERAPHIM_TALENT.id]: { crit: 1007, haste: 1007, mastery: 1007, versatility: 1007 },
     // endregion
 
     /****************************************\
@@ -259,6 +178,9 @@ class StatTracker extends Analyzer {
     264878: { crit: 650 }, // Crow's Nest Scope
     //endregion
 
+    // DEFINING STAT BUFFS HERE IS DEPRECATED.
+    // Instead you should lazily add the buffs by adding the StatTracker as a dependency to your module, and calling `add` in the constructor.
+
     // region Trinkets
     [SPELLS.LOADED_DIE_CRITICAL_STRIKE_SMALL.id]: {
       itemId: ITEMS.HARLANS_LOADED_DICE.id,
@@ -286,7 +208,7 @@ class StatTracker extends Analyzer {
     },
     [SPELLS.GALECALLERS_BOON_BUFF.id]: {
       itemId: ITEMS.GALECALLERS_BOON.id,
-      haste: (_, item) => calculateSecondaryStatDefault(310, 917, item.itemLevel),
+      haste: (_, item) => calculateSecondaryStatDefault(340, 753, item.itemLevel),
     },
     [SPELLS.TITANIC_OVERCHARGE.id]: {
       itemId: ITEMS.CONSTRUCT_OVERCHARGER.id,
@@ -382,27 +304,30 @@ class StatTracker extends Analyzer {
       agility: (_, item) => calculatePrimaryStat(300, 593, item.itemLevel),
     },
     // endregion
-    // region Raids
-    [SPELLS.UNCONTAINED_POWER.id]: {
-      itemId: ITEMS.TWITCHING_TENTACLE_OF_XALZAIX.id,
-      intellect: (_, item) => calculatePrimaryStat(340, 850, item.itemLevel),
-    },
-    // endregion
     // endregion
 
     // region Consumables
     //region Flasks
-    251836: { agility: 238 }, // Flask of the Currents
-    251839: { strength: 238 }, // Flask of the Undertow
-    152639: { intellect: 238 }, // Flask of Endless Fathoms
-    251838: { stamina: 357 }, // Flask of Vast Horizon
+    [SPELLS.FLASK_OF_THE_CURRENTS.id]: { agility: 238 },
+    [SPELLS.FLASK_OF_THE_UNDERTOW.id]: { strength: 238 },
+    [SPELLS.FLASK_OF_ENDLESS_FATHOMS.id]: { intellect: 238 },
+    [SPELLS.FLASK_OF_THE_VAST_HORIZON.id]: { stamina: 357 },
+    [SPELLS.GREATER_FLASK_OF_THE_CURRENTS.id]: { agility: 360 },
+    [SPELLS.GREATER_FLASK_OF_ENDLESS_FATHOMS.id]: { intellect: 360 },
+    [SPELLS.GREATER_FLASK_OF_THE_UNDERTOW.id]: { strength: 360 },
+    [SPELLS.GREATER_FLASK_OF_THE_VAST_HORIZON.id]: { stamina: 540 },
     // endregion
     // region Potions
-    279153: { strength: 900 }, // Battle Potion of Strength
-    279152: { agility: 900 }, // Battle Potion of Agility
-    279151: { intellect: 900 }, // Battle Potion of Intellect
-    279154: { stamina: 1100 }, // Battle Potion of Stamina
-    251231: { armor: 900 }, // Steelskin Potion
+    [SPELLS.BATTLE_POTION_OF_STRENGTH.id]: { strength: 900 }, // Battle Potion of Strength
+    [SPELLS.BATTLE_POTION_OF_AGILITY.id]: { agility: 900 }, // Battle Potion of Agility
+    [SPELLS.BATTLE_POTION_OF_INTELLECT.id]: { intellect: 900 }, // Battle Potion of Intellect
+    [SPELLS.BATTLE_POTION_OF_STAMINA.id]: { stamina: 1100 }, // Battle Potion of Stamina
+    [SPELLS.STEELSKIN_POTION.id]: { armor: 900 }, // Steelskin Potion
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_STRENGTH.id]: { strength: 1215 }, // Superior Battle Potion of Strength
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_AGILITY.id]: { agility: 1215 }, // Superior Battle Potion of Agility
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_INTELLECT.id]: { intellect: 1215 }, // Superior Battle Potion of Intellect
+    [SPELLS.SUPERIOR_BATTLE_POTION_OF_STAMINA.id]: { stamina: 1485 }, // Superior Battle Potion of Stamina
+    [SPELLS.SUPERIOR_STEELSKIN_POTION.id]: { armor: 1215 }, // Superior Steelskin Potion
     // endregion
     // endregion
 
@@ -459,6 +384,9 @@ class StatTracker extends Analyzer {
   add(buffId, stats) {
     if (!buffId || !stats) {
       throw new Error(`StatTracker.add() called with invalid buffId ${buffId} or stats`);
+    }
+    if (typeof buffId === 'object') {
+      buffId = buffId.id;
     }
     if (this.statBuffs[buffId]) {
       throw new Error(`Stat buff with ID ${buffId} already exists`);

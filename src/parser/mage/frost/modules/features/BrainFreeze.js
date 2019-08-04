@@ -1,9 +1,10 @@
 import React from 'react';
 import SPELLS from 'common/SPELLS';
 import SpellLink from 'common/SpellLink';
-import SpellIcon from 'common/SpellIcon';
 import { formatNumber, formatPercentage } from 'common/format';
-import StatisticBox, { STATISTIC_ORDER } from 'interface/others/StatisticBox';
+import Statistic from 'interface/statistics/Statistic';
+import BoringSpellValueText from 'interface/statistics/components/BoringSpellValueText';
+import STATISTIC_ORDER from 'interface/others/STATISTIC_ORDER';
 import Analyzer from 'parser/core/Analyzer';
 
 const debug = false;
@@ -198,19 +199,24 @@ class BrainFreeze extends Analyzer {
 
   statistic() {
     return (
-      <StatisticBox
-        position={STATISTIC_ORDER.CORE(15)}
-        icon={<SpellIcon id={SPELLS.BRAIN_FREEZE.id} />}
-        value={`${formatPercentage(this.utilPercent, 0)} %`}
-        label="Brain Freeze Utilization"
-        tooltip={`You got ${this.totalProcs} total procs.
-					<ul>
-						<li>${this.usedProcs} used</li>
-						<li>${this.overwrittenProcs + this.okOverwrittenProcs} overwritten${this.okOverwrittenProcs > 0 ? ` (${this.okOverwrittenProcs} of which were acceptable holds for Glacial Spike)` : ''}</li>
-						<li>${this.expiredProcs} expired</li>
-					</ul>
-				`}
-      />
+      <Statistic
+        position={STATISTIC_ORDER.CORE(30)}
+        size="flexible"
+        tooltip={(
+          <>
+            You got {this.totalProcs} total procs.
+            <ul>
+              <li>{this.usedProcs} used</li>
+              <li>{this.overwrittenProcs + this.okOverwrittenProcs} overwritten{this.okOverwrittenProcs > 0 && ` (${this.okOverwrittenProcs} of which were acceptable holds for Glacial Spike)`}</li>
+              <li>{this.expiredProcs} expired</li>
+            </ul>
+          </>
+        )}
+      >
+        <BoringSpellValueText spell={SPELLS.BRAIN_FREEZE}>
+          {`${formatPercentage(this.utilPercent, 0)}%`} <small>Proc utilization</small>
+        </BoringSpellValueText>
+      </Statistic>
     );
   }
 }

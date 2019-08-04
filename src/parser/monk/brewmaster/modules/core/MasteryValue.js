@@ -1,5 +1,4 @@
 import React from 'react';
-import { Line as LineChart } from 'react-chartjs-2';
 import SPELLS from 'common/SPELLS';
 import HIT_TYPES from 'game/HIT_TYPES';
 import Analyzer from 'parser/core/Analyzer';
@@ -7,8 +6,10 @@ import StatTracker from 'parser/shared/modules/StatTracker';
 import LazyLoadStatisticBox from 'interface/others/LazyLoadStatisticBox';
 import SpellIcon from 'common/SpellIcon';
 import { formatNumber, formatPercentage } from 'common/format';
+import OneVariableBinomialChart from 'interface/others/charts/OneVariableBinomialChart';
 import DamageTaken from './DamageTaken';
 import GiftOfTheOx from '../spells/GiftOfTheOx';
+
 
 // coefficients to calculate dodge chance from agility
 const MONK_DODGE_COEFFS = {
@@ -79,7 +80,7 @@ class StackMarkovChain {
     this._stackProbs.push(0);
     const n = this._stackProbs.length - 1;
 
-    // probability of ending at 0 stacks. initial 
+    // probability of ending at 0 stacks. initial
     let zeroProb = 0;
     // didn't dodge, gain a stack
     for (let stacks = n - 1; stacks >= 0; stacks--) {
@@ -98,9 +99,9 @@ class StackMarkovChain {
   }
 }
 
-export function baseDodge(agility, dodge_rating = 0) {
+export function baseDodge(agility, dodgeRating = 0) {
   const base = MONK_DODGE_COEFFS.base_dodge + MONK_DODGE_COEFFS.base_agi / MONK_DODGE_COEFFS.P;
-  const chance = (agility - MONK_DODGE_COEFFS.base_agi) / MONK_DODGE_COEFFS.P + dodge_rating / MONK_DODGE_COEFFS.D;
+  const chance = (agility - MONK_DODGE_COEFFS.base_agi) / MONK_DODGE_COEFFS.P + dodgeRating / MONK_DODGE_COEFFS.D;
   // the x / (x + k) formula is commonly used by the wow team to
   // implement diminishing returns
   return (base + chance / (chance * MONK_DODGE_COEFFS.v + MONK_DODGE_COEFFS.h)) / 100;
@@ -253,7 +254,7 @@ class MasteryValue extends Analyzer {
         }
       } else if (event.type === 'damage') {
         const noMasteryDodgeChance = this.dodgeChance(noMasteryStacks.expected, 0, event._agility, event.sourceID, event.timestamp);
-        const noAgiDodgeChance = this.dodgeChance(noAgiStacks.expected, event._masteryRating, 
+        const noAgiDodgeChance = this.dodgeChance(noAgiStacks.expected, event._masteryRating,
                                                   MONK_DODGE_COEFFS.base_agi, event.sourceID, event.timestamp);
         const expectedDodgeChance = this.dodgeChance(stacks.expected, event._masteryRating, event._agility, event.sourceID, event.timestamp);
         const baseDodgeChance = this.dodgeChance(0, 0, event._agility, event.sourceID, event.timestamp);
@@ -347,7 +348,7 @@ class MasteryValue extends Analyzer {
     return this.gotox.masteryBonusHealing;
   }
 
-  plot() {
+  get plot() {
     // not the most efficient, but close enough and pretty safe
     function binom(n, k) {
       if(k > n) {
@@ -362,75 +363,29 @@ class MasteryValue extends Analyzer {
 
     // pmf of the binomial distribution with n = totalDodgeableHits and
     // p = expectedMeanDodge
-    const dodge_prob = (i) => binom(this.totalDodgeableHits, i) * Math.pow(this.expectedMeanDodge, i) * Math.pow(1 - this.expectedMeanDodge, this.totalDodgeableHits - i);
+    const dodgeProb = (i) => binom(this.totalDodgeableHits, i) * Math.pow(this.expectedMeanDodge, i) * Math.pow(1 - this.expectedMeanDodge, this.totalDodgeableHits - i);
 
     // probability of having dodge exactly k of the n incoming hits
     // assuming the expected mean dodge % is the true mean dodge %
-    const dodge_probs = Array.from({length: this.totalDodgeableHits}, (_x, i) => {
-      return { x: i, y: dodge_prob(i) };
+    const dodgeProbs = Array.from({length: this.totalDodgeableHits}, (_x, i) => {
+      return { x: i, y: dodgeProb(i) };
     });
+    const actualDodge = {
+      x: this.totalDodges,
+      y: dodgeProb(this.totalDodges),
+    };
 
     return (
-      <LineChart
-        data={{
-          labels: Array.from({length: this.totalDodgeableHits}, (_x, i) => i),
-          datasets: [
-            {
-              label: 'Actual Dodge',
-              data: [{ x: this.totalDodges, y: dodge_prob(this.totalDodges) }],
-              backgroundColor: '#00ff96',
-              type: 'scatter',
-            },
-            {
-              label: 'Dodge',
-              data: dodge_probs,
-              backgroundColor: 'rgba(255, 139, 45, 0.2)',
-              borderColor: 'rgb(255, 139, 45)',
-              borderWidth: 2,
-              radius: 0,
-            },
-          ],
+      <OneVariableBinomialChart
+        probabilities={dodgeProbs}
+        actualEvent={actualDodge}
+        yDomain={[0, 0.4]}
+        xAxis={{
+          title: 'Dodge %',
+          tickFormat: (value) => `${formatPercentage(value / this.totalDodgeableHits, 0)}%`,
         }}
-        options={{
-          tooltips: {
-            callbacks: {
-              title: (tooltipItem, data) => data.datasets[tooltipItem[0].datasetIndex].label,
-              label: (tooltipItem, data) => `${formatPercentage(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].x / this.totalDodgeableHits)}%`,
-            },
-          },
-          legend: {
-            display: false,
-          },
-          scales: {
-            xAxes: [{
-              stacked: true,
-              scaleLabel: { 
-                display: true,
-                labelString: 'Dodge %',
-                lineHeight: 1,
-                padding: 0,
-                fontColor: '#ccc',
-              },
-              ticks: {
-                fontColor: '#ccc',
-                callback: (x) => `${formatPercentage(x / this.totalDodgeableHits, 0)}%`,
-              },
-            }],
-            yAxes: [{
-              stacked: true,
-              scaleLabel: { 
-                display: true,
-                labelString: 'Likelihood',
-                fontColor: '#ccc',
-              },
-              ticks: {
-                fontColor: '#ccc',
-                callback: (y) => `${formatPercentage(y, 0)}%`,
-              },
-            }],
-          },
-        }}
-        />
+        tooltip={(point) => `Actual Dodge: ${formatPercentage(point.x / this.totalDodgeableHits, 2)}%`}
+      />
     );
   }
 
@@ -447,15 +402,21 @@ class MasteryValue extends Analyzer {
         icon={<SpellIcon id={SPELLS.MASTERY_ELUSIVE_BRAWLER.id} />}
         value={`${formatNumber(this.expectedMitigationPerSecond - this.noMasteryExpectedMitigationPerSecond)} DTPS`}
         label="Expected Mitigation by Mastery"
-        tooltip={this._loaded ? `On average, you would dodge about <b>${formatNumber(this.expectedMitigation)}</b> damage on this fight. This value was increased by about <b>${formatNumber(this.expectedMitigation - this.noMasteryExpectedMitigation)}</b> due to Mastery. You had an average expected dodge chance of <b>${formatPercentage(this.expectedMeanDodge)}%</b> and actually dodged about <b>${formatNumber(this.estimatedActualMitigation)}</b> damage with an overall rate of <b>${formatPercentage(this.actualDodgeRate)}%</b>. This amounts to an expected reduction of <b>${formatNumber((this.expectedMitigationPerSecond - this.noMasteryExpectedMitigationPerSecond) / this.averageMasteryRating)} DTPS per 1 Mastery</b> <em>on this fight</em>.<br/><br/>
+        tooltip={this._loaded ? (
+          <>
+            On average, you would dodge about <strong>{formatNumber(this.expectedMitigation)}</strong> damage on this fight. This value was increased by about <strong>{formatNumber(this.expectedMitigation - this.noMasteryExpectedMitigation)}</strong> due to Mastery.
+            You had an average expected dodge chance of <strong>{formatPercentage(this.expectedMeanDodge)}%</strong> and actually dodged about <strong>{formatNumber(this.estimatedActualMitigation)}</strong> damage with an overall rate of <strong>{formatPercentage(this.actualDodgeRate)}%</strong>.
+            This amounts to an expected reduction of <strong>{formatNumber((this.expectedMitigationPerSecond - this.noMasteryExpectedMitigationPerSecond) / this.averageMasteryRating)} DTPS per 1 Mastery</strong> <em>on this fight</em>.<br /><br />
 
-          <em>Technical Information:</em><br/>
-          <b>Estimated Actual Damage</b> is calculated by calculating the average damage per hit of an ability, then multiplying that by the number of times you dodged each ability.<br/>
-          <b>Expected</b> values are calculated by computing the expected number of mastery stacks each time you <em>could</em> dodge an ability.<br/>
-          An ability is considered <b>dodgeable</b> if you dodged it at least once.` : null}
+            <em>Technical Information:</em><br />
+            <strong>Estimated Actual Damage</strong> is calculated by calculating the average damage per hit of an ability, then multiplying that by the number of times you dodged each ability.<br />
+            <strong>Expected</strong> values are calculated by computing the expected number of mastery stacks each time you <em>could</em> dodge an ability.<br />
+            An ability is considered <strong>dodgeable</strong> if you dodged it at least once.
+          </>
+        ) : null}
         >
         <div style={{padding: '8px'}}>
-          {this._loaded ? this.plot() : null}
+          {this._loaded ? this.plot : null}
           <p>Likelihood of dodging <em>exactly</em> as much as you did with your level of Mastery.</p>
         </div>
       </LazyLoadStatisticBox>

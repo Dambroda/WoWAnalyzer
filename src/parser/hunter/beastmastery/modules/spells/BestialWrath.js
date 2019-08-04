@@ -33,7 +33,11 @@ class BestialWrath extends Analyzer {
     const spellId = event.ability.guid;
     if (spellId === SPELLS.BESTIAL_WRATH.id) {
       this.casts += 1;
-      this.accumulatedFocusAtBWCast += event.classResources[0].amount || 0;
+      if (event.classResources) {
+        event.classResources.forEach(resource => {
+          this.accumulatedFocusAtBWCast += resource.amount || 0;
+        });
+      }
       return;
     }
     if (spellId !== SPELLS.BARBED_SHOT.id) {
@@ -80,8 +84,7 @@ class BestialWrath extends Analyzer {
         },
         style: 'number',
       };
-    }
-    else {
+    } else {
       return {
         actual: this.averageFocusAtBestialWrathCast,
         isLessThan: {
@@ -125,8 +128,8 @@ class BestialWrath extends Analyzer {
       <StatisticBox
         position={STATISTIC_ORDER.CORE(14)}
         icon={<SpellIcon id={SPELLS.BESTIAL_WRATH.id} />}
-        value={<>{this.percentUptime}% uptime</>}
-        label="Bestial Wrath"
+        label={<SpellLink id={SPELLS.BESTIAL_WRATH.id} icon={false} />}
+        value={<>{this.percentUptime}% <small>uptime</small></>}
       >
         <table className="table table-condensed">
           <thead>

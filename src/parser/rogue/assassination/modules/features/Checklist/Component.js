@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 
 import SPELLS from 'common/SPELLS';
 import SpellLink from 'common/SpellLink';
-import Checklist from 'parser/shared/modules/features/Checklist2';
-import Rule from 'parser/shared/modules/features/Checklist2/Rule';
-import Requirement from 'parser/shared/modules/features/Checklist2/Requirement';
-import PreparationRule from 'parser/shared/modules/features/Checklist2/PreparationRule';
-import GenericCastEfficiencyRequirement from 'parser/shared/modules/features/Checklist2/GenericCastEfficiencyRequirement';
+import Checklist from 'parser/shared/modules/features/Checklist';
+import Rule from 'parser/shared/modules/features/Checklist/Rule';
+import Requirement from 'parser/shared/modules/features/Checklist/Requirement';
+import PreparationRule from 'parser/shared/modules/features/Checklist/PreparationRule';
+import GenericCastEfficiencyRequirement from 'parser/shared/modules/features/Checklist/GenericCastEfficiencyRequirement';
 
 class AssassinationRogueChecklist extends React.PureComponent {
   static propTypes = {
@@ -33,7 +33,7 @@ class AssassinationRogueChecklist extends React.PureComponent {
       <Checklist>
         <Rule
           name="Maintain your DoTs on the boss"
-          description="DoTs are a big part of your damage. You should try to keep as high uptime on them as possible."
+          description="DoTs are a big part of your damage. You should try to keep as high uptime on them as possible, but do not refresh them too early"
         >
           <Requirement
             name={(
@@ -50,6 +50,22 @@ class AssassinationRogueChecklist extends React.PureComponent {
               </>
             )}
             thresholds={thresholds.ruptureUptime}
+          />
+          <Requirement
+            name={(
+              <>
+                <SpellLink id={SPELLS.GARROTE.id} /> effective refresh duration
+              </>
+            )}
+            thresholds={thresholds.garroteEfficiency}
+          />
+          <Requirement
+            name={(
+              <>
+                <SpellLink id={SPELLS.RUPTURE.id} /> effective refresh duration
+              </>
+            )}
+            thresholds={thresholds.ruptureEfficiency}
           />
         </Rule>
         <Rule
@@ -87,7 +103,7 @@ class AssassinationRogueChecklist extends React.PureComponent {
         </Rule>
         <Rule
           name="Maximize Vanish usage"
-          description="Your level 30 talent turns Vanish into a powerful DPS cooldown, significantly buffing the next 1-3 casts. Making sure to cast the correct abilities during this short window is important to maximizing your DPS."
+          description="Your level 30 talent turns Vanish into a powerful DPS cooldown, significantly buffing the next 1-3 casts. Making sure to cast the correct abilities during this short window is important to maximizing your DPS. Check Suggestions for more details."
         >
           <AbilityRequirement spell={SPELLS.VANISH.id} />
           {combatant.hasTalent(SPELLS.SUBTERFUGE_TALENT.id) && (

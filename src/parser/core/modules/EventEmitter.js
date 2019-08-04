@@ -1,4 +1,4 @@
-import { captureException } from 'common/errorLogger';
+import MODULE_ERROR from 'parser/core/MODULE_ERROR';
 import Events from '../Events';
 
 import Module from '../Module';
@@ -28,6 +28,7 @@ class EventEmitter extends Module {
   }
 
   _eventListenersByEventType = {};
+  numEventListeners = 0;
   /**
    * @param {string|EventFilter} eventFilter
    * @param {function} listener
@@ -41,6 +42,7 @@ class EventEmitter extends Module {
       module, // used when the listener throws an exception to disable the related module
       listener: this._compileListener(eventFilter, listener, module),
     });
+    this.numEventListeners += 1;
   }
   _compileListener(eventFilter, listener, module) {
     listener = this._prependCounter(listener);
@@ -51,10 +53,10 @@ class EventEmitter extends Module {
     listener = this._prependActiveCheck(listener, module);
     return listener;
   }
-  _actualExecutions = 0;
+  numActualExecutions = 0;
   _prependCounter(listener) {
     return event => {
-      this._actualExecutions += 1;
+      this.numActualExecutions += 1;
       listener(event);
     };
   }
@@ -138,7 +140,8 @@ class EventEmitter extends Module {
     };
   }
 
-  _listenersCalled = 0;
+  numTriggeredEvents = 0;
+  numListenersCalled = 0;
   _isHandlingEvent = false;
   triggerEvent(event) {
     if (process.env.NODE_ENV === 'development') {
@@ -147,6 +150,8 @@ class EventEmitter extends Module {
 
     // When benchmarking the event triggering make sure to disable the event batching and turn the listener into a dummy so you get the performance of just this piece of code. At the time of writing the event triggering code only has about 12ms overhead for a full log.
 
+    this.numTriggeredEvents += 1;
+
     // TODO: Make a module that does the timestamp tracking
     if (event.timestamp) {
       this.owner._timestamp = event.timestamp;
@@ -154,22 +159,17 @@ class EventEmitter extends Module {
 
     let run = options => {
       try {
-        this._listenersCalled += 1;
+        this.numListenersCalled += 1;
         options.listener(event);
       } catch (err) {
-        if (process.env.NODE_ENV !== 'production') {
-          throw err;
-        }
-        console.error('Disabling', options.module.constructor.name, 'and child dependencies because an error occured', err);
-        // Disable this module and all active modules that have this as a dependency
-        this.owner.deepDisable(options.module);
-        captureException(err);
+        this._handleError(err, options.module);
       }
     };
     if (PROFILE) {
       run = this.profile(run);
     }
 
+    this._isHandlingEvent = true;
     {
       // Handle on_event (listeners of all events)
       const listeners = this._eventListenersByEventType[CATCH_ALL_EVENT];
@@ -183,6 +183,7 @@ class EventEmitter extends Module {
         listeners.forEach(run);
       }
     }
+    this._isHandlingEvent = false;
 
     this.owner.eventHistory.push(event);
     // Some modules need to have a primitive value to cause re-renders
@@ -232,6 +233,11 @@ class EventEmitter extends Module {
       currentBatch.forEach(item => item());
     }
   }
+  /**
+   * @param {object} event
+   * @param {object|null} trigger
+   * @returns {object} The event that was triggered.
+   */
   fabricateEvent(event, trigger = null) {
     const fabricatedEvent = {
       // When no timestamp is provided in the event (you should always try to), the current timestamp will be used by default.
@@ -242,16 +248,35 @@ class EventEmitter extends Module {
       type: event.type instanceof EventFilter ? event.type.eventType : event.type,
       __fabricated: true,
     };
-    this.finally(() => {
-      this.triggerEvent(fabricatedEvent);
-    });
-    return fabricatedEvent;
+    if (this._isHandlingEvent) {
+      this.finally(() => {
+        this.triggerEvent(fabricatedEvent);
+      });
+      return fabricatedEvent;
+    } else {
+      return this.triggerEvent(fabricatedEvent);
+    }
   }
   _validateEvent(event) {
     if (!event.type) {
       console.log(event);
       throw new Error('Events should have a type. No type received. See the console for the event.');
     }
+  }
+  _handleError(err, module) {
+    if (process.env.NODE_ENV !== 'production') {
+      throw err;
+    }
+    const name = module.key;
+    console.error('Disabling', name, 'and child dependencies because an error occured:', err);
+    // Disable this module and all active modules that have this as a dependency
+    this.owner.deepDisable(module, MODULE_ERROR.EVENTS, err);
+    window.Sentry && window.Sentry.withScope(scope => {
+      scope.setTag('type', 'module_error');
+      scope.setTag('spec', `${this.selectedCombatant.spec.specName} ${this.selectedCombatant.spec.className}`);
+      scope.setExtra('module', name);
+      window.Sentry.captureException(err);
+    });
   }
 }
 

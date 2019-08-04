@@ -4,6 +4,7 @@ import SPELLS from 'common/SPELLS';
 import SpellLink from 'common/SpellLink';
 import SpellIcon from 'common/SpellIcon';
 import { formatNumber, formatPercentage } from 'common/format';
+import { TooltipElement } from 'common/Tooltip';
 
 import Analyzer from 'parser/core/Analyzer';
 import Combatants from 'parser/shared/modules/Combatants';
@@ -16,6 +17,11 @@ class EssenceFontMastery extends Analyzer {
   static dependencies = {
     combatants: Combatants,
   };
+
+  constructor(...args) {
+    super(...args);
+    this.hasUpwelling = this.selectedCombatant.hasTalent(SPELLS.UPWELLING_TALENT.id);
+  }
 
   healEF = 0;
   healing = 0;
@@ -35,13 +41,10 @@ class EssenceFontMastery extends Analyzer {
       if (this.combatants.players[targetId].hasBuff(SPELLS.ESSENCE_FONT_BUFF.id, event.timestamp, 0, 0) === true && !this.gustHeal) {
         debug && console.log(`First Gust Heal: Player ID: ${event.targetID}  Timestamp: ${event.timestamp}`);
         this.healEF += 1;
-        this.healing += (event.amount || 0) + (event.absorbed || 0);
         this.gustHeal = true;
       } else if (this.combatants.players[targetId].hasBuff(SPELLS.ESSENCE_FONT_BUFF.id, event.timestamp, 0, 0) === true && this.gustHeal) {
         this.healEF += 1;
         this.healing += (event.amount || 0) + (event.absorbed || 0);
-        this.secondGustHealing += (event.amount || 0) + (event.absorbed || 0) + (event.overheal || 0);
-        this.secondGustOverheal += (event.overheal || 0);
         this.gustHeal = false;
       }
     }
@@ -72,15 +75,27 @@ class EssenceFontMastery extends Analyzer {
   }
 
   get suggestionThresholds() {
-    return {
-      actual: this.avgMasteryCastsPerEF,
-      isLessThan: {
-        minor: 1.5,
-        average: 1,
-        major: .5,
-      },
-      style: 'decimal',
-    };
+    if (this.hasUpwelling) {
+      return {
+        actual: this.avgMasteryCastsPerEF,
+        isLessThan: {
+          minor: 4,
+          average: 3.5,
+          major: 3,
+        },
+        style: 'decimal',
+      };
+    } else {
+     return {
+        actual: this.avgMasteryCastsPerEF,
+        isLessThan: {
+          minor: 3,
+          average: 2.5,
+          major: 2,
+       },
+       style: 'decimal',
+      };
+   }
   }
 
   suggestions(when) {
@@ -105,14 +120,21 @@ class EssenceFontMastery extends Analyzer {
       <StatisticBox
         position={STATISTIC_ORDER.OPTIONAL(0)}
         icon={<SpellIcon id={SPELLS.GUSTS_OF_MISTS.id} />}
-        value={`${efMasteryCasts}`}
+        value={efMasteryCasts}
         label={(
-          <dfn data-tip={`You healed an average of ${this.avgMasteryCastsPerEF.toFixed(2)} targets per Essence Font cast.<ul>
-            <li>${formatNumber(avgEFMasteryHealing)} average healing per cast</li>
-            <li>${formatNumber(this.secondGustOverheal)} Second Gust of Mists overhealing (${formatPercentage(this.secondGustOverheal / this.secondGustHealing)}%)</li>
-            </ul>`}>
+          <TooltipElement
+            content={(
+              <>
+                You healed an average of {this.avgMasteryCastsPerEF.toFixed(2)} targets per Essence Font cast.
+                <ul>
+                  <li>{formatNumber(avgEFMasteryHealing)} average healing per cast</li>
+                  <li>{formatNumber(this.secondGustOverheal)} Second Gust of Mists overhealing ({formatPercentage(this.secondGustOverheal / this.secondGustHealing)}%)</li>
+                </ul>
+              </>
+            )}
+          >
             Mastery Buffs utilized
-          </dfn>
+          </TooltipElement>
         )}
       />
     );

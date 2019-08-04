@@ -13,6 +13,7 @@ class ImmolationAura extends Analyzer {
   static dependencies = {
     abilityTracker: AbilityTracker,
   };
+
   statistic() {
     const immolationAuraUptime = this.selectedCombatant.getBuffUptime(SPELLS.IMMOLATION_AURA.id);
 
@@ -20,13 +21,15 @@ class ImmolationAura extends Analyzer {
 
     this.immolationAuraDamage = this.abilityTracker.getAbility(SPELLS.IMMOLATION_AURA_FIRST_STRIKE.id).damageEffective + this.abilityTracker.getAbility(SPELLS.IMMOLATION_AURA_BUFF.id).damageEffective;
 
+
+
     return (
       <StatisticBox
         position={STATISTIC_ORDER.CORE(4)}
         icon={<SpellIcon id={SPELLS.IMMOLATION_AURA.id} />}
         value={`${formatPercentage(immolationAuraUptimePercentage)}%`}
         label="Immolation Aura uptime"
-        tooltip={`The Immolation Aura total damage was ${formatThousands(this.immolationAuraDamage)}.<br/>The Immolation Aura total uptime was ${formatDuration(immolationAuraUptime / 1000)}.`}
+        tooltip={<>The Immolation Aura total damage was {formatThousands(this.immolationAuraDamage)}.<br />The Immolation Aura total uptime was {formatDuration(immolationAuraUptime / 1000)}</>}
       />
     );
   }

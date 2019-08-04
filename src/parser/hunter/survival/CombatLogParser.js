@@ -1,7 +1,8 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 import Abilities from './modules/Abilities';
+import Checklist from './modules/checklist/Module';
+
 //Features
 import CooldownThroughputTracker from './modules/features/CooldownThroughputTracker';
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
@@ -42,14 +43,15 @@ import TipOfTheSpear from './modules/talents/TipOfTheSpear';
 import WildernessSurvival from './modules/spells/azeritetraits/WildernessSurvival';
 import LatentPoison from './modules/spells/azeritetraits/LatentPoison';
 import BlurOfTalons from './modules/spells/azeritetraits/BlurOfTalons';
+import PrimevalIntuition from './modules/spells/azeritetraits/PrimevalIntuition';
 //Traits and Talents
 import SpellsAndTalents from './modules/features/SpellsAndTalents';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Core statistics
-    damageDone: [DamageDone, { showStatistic: true }],
     abilities: Abilities,
+    checklist: Checklist,
 
     // Features
     alwaysBeCasting: AlwaysBeCasting,
@@ -97,6 +99,7 @@ class CombatLogParser extends CoreCombatLogParser {
     wildernessSurvival: WildernessSurvival,
     latentPoison: LatentPoison,
     blurOfTalons: BlurOfTalons,
+    primevalIntuition: PrimevalIntuition,
 
     //Traits and talents
     traitsAndTalents: SpellsAndTalents,

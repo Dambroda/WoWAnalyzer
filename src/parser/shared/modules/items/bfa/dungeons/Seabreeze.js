@@ -1,7 +1,11 @@
 import React from 'react';
 
-import SPELLS from 'common/SPELLS/index';
-import ITEMS from 'common/ITEMS/index';
+import SPELLS from 'common/SPELLS';
+import ITEMS from 'common/ITEMS';
+import UptimeIcon from 'interface/icons/Uptime';
+import HasteIcon from 'interface/icons/Haste';
+import ItemStatistic from 'interface/statistics/ItemStatistic';
+import BoringItemValueText from 'interface/statistics/components/BoringItemValueText';
 import Analyzer from 'parser/core/Analyzer';
 import { formatPercentage, formatNumber } from 'common/format';
 import { calculateSecondaryStatDefault } from 'common/stats';
@@ -34,16 +38,18 @@ class Seabreeze extends Analyzer {
     return averageStacks * this.statBuff;
   }
 
-  item() {
-    return {
-      item: ITEMS.SEABREEZE,
-      result: (
-        <>
-          {formatPercentage(this.totalBuffUptime)}% uptime<br />
-          <dfn data-tip={`The stat budget for a non-proc main hand would yield ${formatNumber(this.statBudget)} secondary stats`}>{formatNumber(this.averageStatGain)} average Haste gained.</dfn>
-        </>
-      ),
-    };
+  statistic() {
+    return (
+      <ItemStatistic
+        size="flexible"
+        tooltip={`The stat budget for a non-proc main hand would yield ${formatNumber(this.statBudget)} secondary stats`}
+      >
+        <BoringItemValueText item={ITEMS.SEABREEZE}>
+          <UptimeIcon /> {formatPercentage(this.totalBuffUptime)}% <small>uptime</small> <br />
+          <HasteIcon /> {formatNumber(this.averageStatGain)} <small>average Haste gained</small>
+        </BoringItemValueText>
+      </ItemStatistic>
+    );
   }
 }
 

@@ -15,8 +15,23 @@ export default {
     name: 'Radiant Incandescence',
     icon: 'spell_holy_searinglight',
   },
+  RADIANT_INCANDESCENCE_DAMAGE: {
+    id: 278145,
+    name: 'Radiant Incandescence',
+    icon: 'spell_holy_searinglight',
+  },
+  RADIANT_INCANDESCENCE_TRAIT: {
+    id: 277674,
+    name: 'Radiant Incandescence',
+    icon: 'spell_holy_searinglight',
+  },
 
   // Holy
+  GRACE_OF_THE_JUSTICAR_TRAIT: {
+    id: 278593,
+    name: 'Grace of the Justicar',
+    icon: 'spell_holy_healingaura',
+  },
   GRACE_OF_THE_JUSTICAR: {
     id: 278785,
     name: 'Grace of the Justicar',
@@ -24,6 +39,16 @@ export default {
   },
   GLIMMER_OF_LIGHT: {
     id: 287286,
+    name: 'Glimmer of Light',
+    icon: 'ability_paladin_toweroflight',
+  },
+  GLIMMER_OF_LIGHT_TRAIT: {
+    id: 287268,
+    name: 'Glimmer of Light',
+    icon: 'ability_paladin_toweroflight',
+  },
+  GLIMMER_OF_LIGHT_DAMAGE: {
+    id: 287285,
     name: 'Glimmer of Light',
     icon: 'ability_paladin_toweroflight',
   },
@@ -47,7 +72,7 @@ export default {
   INDOMITABLE_JUSTICE: {
     id: 275496,
     name: 'Indomitable Justice',
-    ïcon: 'spell_holy_righteousfury',
+    icon: 'spell_holy_righteousfury',
   },
   LIGHTS_DECREE: {
     id: 286229,

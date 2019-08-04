@@ -1,9 +1,13 @@
 import SPELLS from 'common/SPELLS';
 
 import EventsNormalizer from 'parser/core/EventsNormalizer';
+import { PRE_FILTER_BUFF_EVENT_TYPE } from 'interface/report/TimeEventFilter';
 
 const debug = false;
 
+/**
+ * Some buffs like Bloodlust and Holy Avenger when they are applied pre-combat it doesn't show up as an `applybuff` event nor in the `combatantinfo` buffs array. It can still be detected by looking for a `removebuff` event, this uses that to detect it and then fabricates an `applybuff` event at the start of the log.
+ */
 class ApplyBuff extends EventsNormalizer {
   // We need to track `combatantinfo` events this way since they aren't included in the `events` passed to `normalize` due to technical reasons (it's a different API call). We still need `combatantinfo` for all players, so cache it manually.
   _combatantInfoEvents = [];
@@ -14,15 +18,13 @@ class ApplyBuff extends EventsNormalizer {
 
   _buffsAppliedByPlayerId = {};
 
-  /**
-   * Some buffs like Bloodlust and Holy Avenger when they are applied pre-combat it doesn't show up as an `applybuff` event nor in the `combatantinfo` buffs array. It can still be detected by looking for a `removebuff` event, this uses that to detect it and then fabricates an `applybuff` event at the start of the log.
-   * @param {Array} events
-   * @returns {Array}
-   */
   normalize(events) {
     const firstEventIndex = this.getFightStartIndex(events);
     const firstStartTimestamp = this.owner.fight.start_time;
-    const playersById = this.owner.playersById;
+    const playersById = this.owner.players.reduce((obj, player) => {
+      obj[player.id] = player;
+      return obj;
+    }, {});
     const playerId = this.owner.playerId;
 
     // region Buff event based detection
@@ -43,7 +45,7 @@ class ApplyBuff extends EventsNormalizer {
         const spellId = event.ability.guid;
         this._buffsAppliedByPlayerId[targetId].push(spellId);
       }
-      if (['removebuff', 'applybuffstack', 'removebuffstack', 'refreshbuff'].includes(event.type)) {
+      if (['removebuff', 'applybuffstack', 'removebuffstack', 'refreshbuff', PRE_FILTER_BUFF_EVENT_TYPE].includes(event.type)) {
         const spellId = event.ability.guid;
         if (this._buffsAppliedByPlayerId[targetId].includes(spellId)) {
           // This buff has an `applybuff` event and so isn't broken :D
@@ -54,7 +56,7 @@ class ApplyBuff extends EventsNormalizer {
         const targetInfo = this._combatantInfoEvents.find(combatantInfoEvent => combatantInfoEvent.sourceID === targetId);
         const applybuff = {
           // These are all the properties a normal `applybuff` event would have.
-          timestamp: firstStartTimestamp,
+          timestamp: (event.type === PRE_FILTER_BUFF_EVENT_TYPE) ? firstStartTimestamp - this.owner.fight.offset_time : firstStartTimestamp,
           type: 'applybuff',
           ability: event.ability,
           sourceID: sourceId,

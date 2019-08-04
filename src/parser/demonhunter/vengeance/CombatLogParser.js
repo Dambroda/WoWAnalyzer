@@ -1,11 +1,8 @@
 import React from 'react';
 
-import Tab from 'interface/others/Tab';
+import Panel from 'interface/others/Panel';
 
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import HealingDone from 'parser/shared/modules/HealingDone';
-import DamageDone from 'parser/shared/modules/DamageDone';
-import DamageTaken from 'parser/shared/modules/DamageTaken';
 
 import PainChart from './modules/painchart/Pain';
 import PainTracker from './modules/pain/PainTracker';
@@ -38,14 +35,9 @@ import DemonSpikes from './modules/spells/DemonSpikes';
 import SigilOfFlame from './modules/spells/SigilOfFlame';
 import SoulCleaveSoulsConsumed from './modules/spells/SoulCleaveSoulsConsumed';
 
-import SoulOfTheSlayer from '../shared/modules/items/SoulOfTheSlayer';
-
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Core Statistics
-    damageDone: [DamageDone, { showStatistic: true }],
-    damageTaken: [DamageTaken, { showStatistic: true }],
-    healingDone: [HealingDone, { showStatistic: true }],
     mitigationCheck: MitigationCheck,
 
     // Features
@@ -80,9 +72,6 @@ class CombatLogParser extends CoreCombatLogParser {
     // Stats
     soulsOvercap: SoulsOvercap,
     soulFragmentsConsume: SoulFragmentsConsume,
-
-    /// Items
-    soulOfTheSlayer: SoulOfTheSlayer,
   };
 
   generateResults(...args) {
@@ -94,14 +83,14 @@ class CombatLogParser extends CoreCombatLogParser {
         title: 'Pain Chart',
         url: 'pain',
         render: () => (
-          <Tab style={{ padding: '15px 22px' }}>
+          <Panel style={{ padding: '15px 22px' }}>
             <PainChart
               reportCode={this.report.code}
               actorId={this.playerId}
               start={this.fight.start_time}
               end={this.fight.end_time}
             />
-          </Tab>
+          </Panel>
         ),
       },
     ];

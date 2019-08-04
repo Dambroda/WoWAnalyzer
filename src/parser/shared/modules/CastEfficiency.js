@@ -1,16 +1,15 @@
 import React from 'react';
-import { t, Trans } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import SpellLink from 'common/SpellLink';
 import { formatPercentage } from 'common/format';
+import Panel from 'interface/statistics/Panel';
+import CastEfficiencyComponent from 'interface/others/CastEfficiency';
 import Analyzer from 'parser/core/Analyzer';
 import SpellHistory from 'parser/shared/modules/SpellHistory';
-import { i18n } from 'interface/RootLocalizationProvider';
-import Tab from 'interface/others/Tab';
-import CastEfficiencyComponent from 'interface/others/CastEfficiency';
 import Channeling from 'parser/shared/modules/Channeling';
+import Abilities from 'parser/core/modules/Abilities';
 
-import Abilities from '../../core/modules/Abilities';
 import AbilityTracker from './AbilityTracker';
 import Haste from './Haste';
 
@@ -57,13 +56,15 @@ class CastEfficiency extends Analyzer {
           lastRechargeTimestamp = event.timestamp;
           return acc;
         } else if (event.trigger === 'endcooldown') {
-          const rechargingTime = (event.timestamp - lastRechargeTimestamp) || 0;
+          //limit by start time in case of pre phase events
+          const rechargingTime = (event.timestamp - Math.max(lastRechargeTimestamp, this.owner.fight.start_time)) || 0;
           recharges += 1;
           lastRechargeTimestamp = null;
           return acc + rechargingTime;
           // This might cause oddness if we add anything that externally refreshes charges, but so far nothing does
         } else if (event.trigger === 'restorecharge') {
-          const rechargingTime = (event.timestamp - lastRechargeTimestamp) || 0;
+          //limit by start time in case of pre phase events
+          const rechargingTime = (event.timestamp - Math.max(lastRechargeTimestamp, this.owner.fight.start_time)) || 0;
           recharges += 1;
           lastRechargeTimestamp = event.timestamp;
           return acc + rechargingTime;
@@ -71,7 +72,8 @@ class CastEfficiency extends Analyzer {
           return acc;
         }
       }, 0);
-    const endingRechargeTime = (!lastRechargeTimestamp) ? 0 : this.owner.currentTimestamp - lastRechargeTimestamp;
+      //limit by start time in case of pre phase events
+    const endingRechargeTime = (!lastRechargeTimestamp) ? 0 : this.owner.currentTimestamp - Math.max(lastRechargeTimestamp, this.owner.fight.start_time);
 
     const casts = history.filter(event => event.type === 'cast').length;
 
@@ -99,21 +101,23 @@ class CastEfficiency extends Analyzer {
           beginCastTimestamp = event.timestamp;
           return acc;
         } else if (event.type === 'cast') {
-          const castTime = beginCastTimestamp ? (event.timestamp - beginCastTimestamp) : 0;
+          //limit by start time in case of pre phase events
+          const castTime = beginCastTimestamp ? (event.timestamp - Math.max(beginCastTimestamp, this.owner.fight.start_time)) : 0;
           beginCastTimestamp = null;
           return acc + castTime;
         } else if (event.type === 'beginchannel') {
           beginChannelTimestamp = event.timestamp;
           return acc;
         } else if (event.type === 'endchannel') {
-          const channelTime = beginChannelTimestamp ? (event.timestamp - beginChannelTimestamp) : 0;
+          //limit by start time in case of pre phase events
+          const channelTime = beginChannelTimestamp ? (event.timestamp - Math.max(beginChannelTimestamp, this.owner.fight.start_time)) : 0;
           beginCastTimestamp = null;
           return acc + channelTime;
         } else {
           return acc;
         }
       }, 0);
-      
+
     return timeSpentCasting;
   }
 
@@ -314,20 +318,19 @@ class CastEfficiency extends Analyzer {
       });
     });
   }
-
-  tab() {
-    return {
-      title: i18n._(t`Abilities`),
-      url: 'abilities',
-      render: () => (
-        <Tab>
-          <CastEfficiencyComponent
-            categories={this.abilities.constructor.SPELL_CATEGORIES}
-            abilities={this.getCastEfficiency()}
-          />
-        </Tab>
-      ),
-    };
+  statistic() {
+    return (
+      <Panel
+        title="Abilities"
+        position={500}
+        pad={false}
+      >
+        <CastEfficiencyComponent
+          categories={this.abilities.constructor.SPELL_CATEGORIES}
+          abilities={this.getCastEfficiency()}
+        />
+      </Panel>
+    );
   }
 }
 

@@ -25,11 +25,24 @@ class GuardianSpirit extends Analyzer {
     return this.abilityTracker.getAbility(SPELLS.GUARDIAN_SPIRIT.id).casts;
   }
 
+  get filter() {
+    return `
+    IN RANGE 
+      FROM type='applybuff' 
+          AND ability.id=${SPELLS.GUARDIAN_SPIRIT.id} 
+          AND source.name='${this.selectedCombatant.name}' 
+      TO type='removebuff' 
+          AND ability.id=${SPELLS.GUARDIAN_SPIRIT.id} 
+          AND source.name='${this.selectedCombatant.name}' 
+      GROUP BY 
+        target ON target END`;
+  }
+
   load() {
     return fetchWcl(`report/tables/healing/${this.owner.report.code}`, {
       start: this.owner.fight.start_time,
       end: this.owner.fight.end_time,
-      filter: `IN RANGE FROM type='applybuff' AND ability.id=${SPELLS.GUARDIAN_SPIRIT.id} TO type='removebuff' AND ability.id=${SPELLS.GUARDIAN_SPIRIT.id} GROUP BY target ON target END`,
+      filter: this.filter,
     })
       .then(json => {
         this.totalHealingFromGSBuff = json.entries.reduce(
@@ -42,7 +55,6 @@ class GuardianSpirit extends Analyzer {
       });
   }
 
-
   statistic() {
     return (
       <LazyLoadStatisticBox
@@ -52,10 +64,12 @@ class GuardianSpirit extends Analyzer {
           <ItemHealingDone amount={this.totalHealingFromGSBuff} />
         )}
         label="Guardian Spirit Buff Contribution"
-        tooltip={
-          `You casted Guardian Spirit ${this.totalGSCasts} times, and it contributed ${formatNumber(this.totalHealingFromGSBuff)} healing. This includes healing from other healers.<br/>
-          NOTE: This metric uses an approximation to calculate contribution from the buff due to technical limitations.`
-        }
+        tooltip={(
+          <>
+            You casted Guardian Spirit {this.totalGSCasts} times, and it contributed {formatNumber(this.totalHealingFromGSBuff)} healing. This includes healing from other healers.<br />
+            NOTE: This metric uses an approximation to calculate contribution from the buff due to technical limitations.
+          </>
+        )}
       />
     );
   }

@@ -2,13 +2,14 @@
 import React from 'react';
 
 import Analyzer from 'parser/core/Analyzer';
-import Tab from 'interface/others/Tab';
-import StatisticBox, { STATISTIC_ORDER } from 'interface/others/StatisticBox';
-
+import Panel from 'interface/others/Panel';
+import Statistic from 'interface/statistics/Statistic';
+import { STATISTIC_ORDER } from 'interface/others/StatisticBox';
 import ResourceBreakdown from 'parser/shared/modules/resourcetracker/ResourceBreakdown';
-import ChiTracker from './ChiTracker';
-
-import WastedChiIcon from '../../images/ability_monk_forcesphere.jpg';
+import ChiTracker from 'parser/monk/windwalker/modules/resources/ChiTracker';
+import RESOURCE_TYPES from 'game/RESOURCE_TYPES';
+import BoringResourceValue from 'interface/statistics/components/BoringResourceValue/index';
+import { formatPercentage } from 'common/format';
 
 class ChiDetails extends Analyzer {
   static dependencies = {
@@ -17,6 +18,10 @@ class ChiDetails extends Analyzer {
 
   get chiWasted() {
     return this.chiTracker.wasted;
+  }
+
+  get chiWastedPercent() {
+    return this.chiWasted / (this.chiWasted + this.chiTracker.generated) || 0;
   }
 
   get chiWastedPerMinute() {
@@ -39,24 +44,24 @@ class ChiDetails extends Analyzer {
     when(this.suggestionThresholds).addSuggestion((suggest, actual, recommended) => {
       return suggest('You are wasting Chi. Try to use it and not let it cap and go to waste')
         .icon('creatureportrait_bubble')
-        .actual(`${this.chiWasted} Chi wasted (${actual} per minute)`)
-        .recommended(`${recommended.toFixed(2)} Chi wasted is recommended`);
+        .actual(`${this.chiWasted} Chi wasted (${(actual.toFixed(2))} per minute)`)
+        .recommended(`${recommended} Chi wasted is recommended`);
     });
   }
 
   statistic() {
     return (
-      <StatisticBox
+      <Statistic
+        size="small"
         position={STATISTIC_ORDER.CORE(1)}
-        icon={(
-          <img
-            src={WastedChiIcon}
-            alt="Wasted Chi"
-          />
-        )}
-        value={`${this.chiWasted}`}
-        label="Wasted Chi"
-      />
+        tooltip={<>{formatPercentage(this.chiWastedPercent)}% wasted</>}
+      >
+        <BoringResourceValue
+          resource={RESOURCE_TYPES.CHI}
+          value={this.chiWasted}
+          label="Wasted Chi"
+        />
+      </Statistic>
     );
   }
 
@@ -65,13 +70,13 @@ class ChiDetails extends Analyzer {
       title: 'Chi',
       url: 'chi',
       render: () => (
-        <Tab>
+        <Panel>
           <ResourceBreakdown
             tracker={this.chiTracker}
             resourceName="Chi"
             showSpenders
           />
-        </Tab>
+        </Panel>
       ),
     };
   }

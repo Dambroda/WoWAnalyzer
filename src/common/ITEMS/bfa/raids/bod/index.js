@@ -3,6 +3,15 @@ import ITEM_QUALITIES from 'game/ITEM_QUALITIES';
 
 export default {
   // Group by boss (with comments)
+
+  // Champions of Light
+  WARD_OF_ENVELOPMENT: {
+    id: 165569,
+    name: 'Ward of Envelopment',
+    icon: "misc_legionfall_paladin",
+    quality: ITEM_QUALITIES.PURPLE,
+  },
+
   // Taloc
   CREST_OF_PAKU_HORDE: {
     id: 165581,
@@ -22,6 +31,13 @@ export default {
     id: 165571,
     name: 'Incandescent Sliver',
     icon: 'ability_priest_cascade',
+    quality: ITEM_QUALITIES.PURPLE,
+  },
+
+  DIAMOND_LACED_REFLECTING_PRISM: {
+    id: 165573,
+    name: 'Diamond-Laced Reflecting Prism',
+    icon: 'hunter_pvp_diamondice',
     quality: ITEM_QUALITIES.PURPLE,
   },
 };

@@ -693,12 +693,12 @@ export default {
   MAIM: {
     id: 22570,
     name: 'Maim',
-    icon: 'ability_druid_mangle-tga',
+    icon: 'ability_druid_mangle',
   },
-  MAIM_DEBUFF: {
+  MAIM_DEBUFF: { // the stun caused by Maim, which shows in the log as a 0 damage event
     id: 203123,
     name: 'Maim',
-    icon: 'ability_druid_mangle-tga',
+    icon: 'ability_druid_mangle',
   },
   RAKE_BLEED: {
     id: 155722,
@@ -771,6 +771,12 @@ export default {
     id: 252071,
     name: 'Jungle Stalker',
     icon: 'ability_mount_siberiantigermount',
+  },
+  // effect that shows up in the combat log for energy generated from feral's Soul of the Forest talent.
+  SOUL_OF_THE_FOREST_FERAL_ENERGY: {
+    id: 114113,
+    name: 'Soul of the Forest',
+    icon: 'ability_druid_manatree',
   },
 
   // feral legion tier sets

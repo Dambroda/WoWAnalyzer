@@ -21,6 +21,7 @@ export const ABILITIES_AFFECTED_BY_HEALING_INCREASES = [
   271682, // Harmonious Chord - https://www.warcraftlogs.com/reports/cXnPABVbLjk68qyM#fight=6&type=healing&source=10&ability=271682&view=events
 ];
 
+// TODO: Feed this with the SpellInfo config
 export const ABILITIES_AFFECTED_BY_MASTERY = [
   SPELLS.HOLY_SHOCK_HEAL.id,
   SPELLS.LIGHT_OF_DAWN_HEAL.id,
@@ -35,6 +36,7 @@ export const ABILITIES_AFFECTED_BY_MASTERY = [
   SPELLS.GRACE_OF_THE_JUSTICAR.id,
   SPELLS.CONCENTRATED_MENDING_HEALING.id, // TODO: Re-evaluate, going on word of mouth and I have my doubts
   SPELLS.RADIANT_INCANDESCENCE.id, // https://www.warcraftlogs.com/reports/n4kTCKyhp1G2ANDx/#fight=12&source=2&type=healing&ability=278147&view=events
+  SPELLS.GLIMMER_OF_LIGHT.id,
 ];
 
 export const BEACON_TRANSFERING_ABILITIES = {

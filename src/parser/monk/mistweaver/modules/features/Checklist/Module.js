@@ -1,10 +1,10 @@
 import React from 'react';
 
-import BaseChecklist from 'parser/shared/modules/features/Checklist2/Module';
+import BaseChecklist from 'parser/shared/modules/features/Checklist/Module';
 import CastEfficiency from 'parser/shared/modules/CastEfficiency';
 import Combatants from 'parser/shared/modules/Combatants';
 import ManaValues from 'parser/shared/modules/ManaValues';
-import PreparationRuleAnalyzer from 'parser/shared/modules/features/Checklist2/PreparationRuleAnalyzer';
+import PreparationRuleAnalyzer from 'parser/shared/modules/features/Checklist/PreparationRuleAnalyzer';
 
 import AlwaysBeCasting from '../AlwaysBeCasting';
 import EssenceFont from '../../spells/EssenceFont';
@@ -16,9 +16,12 @@ import Lifecycles from '../../talents/Lifecycles';
 import ThunderFocusTea from '../../spells/ThunderFocusTea';
 import EssenceFontMastery from '../EssenceFontMastery';
 import RenewingMistDuringManaTea from '../../talents/RenewingMistDuringManaTea';
+import SpinningCraneKick from '../../spells/SpinningCraneKick';
 import Vivify from '../../spells/Vivify';
+import JadeSerpentStatue from '../../talents/JadeSerpentStatue';
 
 import Component from './Component';
+import SoothingMist from '../../spells/SoothingMist';
 
 class Checklist extends BaseChecklist {
   static dependencies = {
@@ -36,7 +39,10 @@ class Checklist extends BaseChecklist {
     thunderFocusTea: ThunderFocusTea,
     essenceFontMastery: EssenceFontMastery,
     renewingMistDuringManaTea: RenewingMistDuringManaTea,
+    spinningCraneKick: SpinningCraneKick,
     vivify: Vivify,
+    jadeSerpentStatue: JadeSerpentStatue,
+    soothingMist: SoothingMist,
   };
 
   render() {
@@ -55,12 +61,15 @@ class Checklist extends BaseChecklist {
           chiBurst: this.chiBurst.suggestionThresholds,
           spiritOfTheCrane: this.spiritOfTheCrane.suggestionThresholds,
           manaTea: this.manaTea.suggestionThresholds,
+          manaTeaOverhealing: this.manaTea.suggestionThresholdsOverhealing,
+          spinningCraneKick: this.spinningCraneKick.suggestionThresholds,
           lifecycles: this.lifecycles.suggestionThresholds,
           thunderFocusTea: this.thunderFocusTea.suggestionThresholds,
           essenceFontMastery: this.essenceFontMastery.suggestionThresholds,
           renewingMistDuringManaTea: this.renewingMistDuringManaTea.suggestionThresholds,
           vivify: this.vivify.suggestionThresholds,
-
+          jadeSerpentStatue: this.jadeSerpentStatue.suggestionThresholds,
+          soothingMist: this.soothingMist.suggestionThresholdsCasting,
         }}
       />
     );

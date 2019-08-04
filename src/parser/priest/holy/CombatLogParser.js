@@ -1,17 +1,20 @@
 import React from 'react';
 
-import Tab from 'interface/others/Tab';
+import Panel from 'interface/others/Panel';
 import HolyPriestSpreadsheet from 'interface/others/HolyPriestSpreadsheet';
 
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import LowHealthHealing from 'parser/shared/modules/features/LowHealthHealing';
-import HealingDone from 'parser/shared/modules/HealingDone';
+import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
+import ManaUsageChart from 'parser/shared/modules/resources/mana/ManaUsageChart';
+
 import Abilities from './modules/Abilities';
 
 import SpellManaCost from './modules/core/SpellManaCost';
 // Spell data
 import DivineHymn from './modules/spells/DivineHymn';
 import GuardianSpirit from './modules/spells/GuardianSpirit';
+import HolyNova from './modules/spells/HolyNova';
 import HolyWordSanctify from './modules/spells/holyword/HolyWordSanctify';
 import HolyWordSerenity from './modules/spells/holyword/HolyWordSerenity';
 import HolyWordChastise from './modules/spells/holyword/HolyWordChastise';
@@ -30,8 +33,8 @@ import SpellUsable from './modules/features/SpellUsable';
 import HealingReceived from './modules/features/HealingReceived';
 import HealingTargetTracker from './modules/features/HealingTargetTracker';
 // Priest Core
-import EchoOfLight_Mastery from './modules/core/EchoOfLight_Mastery';
-import Fortitude_RaidBuff from './modules/core/Fortitude_RaidBuff';
+import EchoOfLightMastery from './modules/core/EchoOfLightMastery';
+import FortitudeRaidBuff from './modules/core/FortitudeRaidBuff';
 import HolyWordsReductionBySpell from './modules/core/HolyWordsReductionBySpell';
 import HolyWordWastedAmounts from './modules/core/HolyWordWastedAmounts';
 
@@ -57,9 +60,12 @@ class CombatLogParser extends CoreCombatLogParser {
 
   static specModules = {
     spellManaCost: SpellManaCost,
-    healingDone: [HealingDone, { showStatistic: true }],
     abilities: Abilities,
     lowHealthHealing: LowHealthHealing,
+
+    // Generic healer things
+    manaLevelChart: ManaLevelChart,
+    manaUsageChart: ManaUsageChart,
 
     // Features
     alwaysBeCasting: AlwaysBeCasting,
@@ -70,14 +76,15 @@ class CombatLogParser extends CoreCombatLogParser {
     healingTargetTracker: HealingTargetTracker,
 
     // Core
-    echoOfLight_Mastery: EchoOfLight_Mastery,
-    fortitude_RaidBuff: Fortitude_RaidBuff,
+    echoOfLightMastery: EchoOfLightMastery,
+    fortitudeRaidBuff: FortitudeRaidBuff,
     holyWordsReductionBySpell: HolyWordsReductionBySpell,
     holyWordWastedAmounts: HolyWordWastedAmounts,
 
     // Spells
     divineHymn: DivineHymn,
     guardianSpirit: GuardianSpirit,
+    holyNova: HolyNova,
     hymnBuffBenefit: HymnBuffBenefit,
     holyWordSanctify: HolyWordSanctify,
     holyWordSerenity: HolyWordSerenity,
@@ -89,33 +96,33 @@ class CombatLogParser extends CoreCombatLogParser {
     prayerOfMending: PrayerOfMending,
 
     // Talents
-    Enlightenment: Talents.talents_15.Enlightenment,
-    TrailOfLight: Talents.talents_15.TrailOfLight,
-    EnduringRenewal: Talents.talents_15.EnduringRenewal,
+    Enlightenment: Talents.t15.Enlightenment,
+    TrailOfLight: Talents.t15.TrailOfLight,
+    EnduringRenewal: Talents.t15.EnduringRenewal,
 
-    AngelicFeather: Talents.talents_30.AngelicFeather,
-    AngelsMercy: Talents.talents_30.AngelsMercy,
-    Perseverance: Talents.talents_30.Perseverance,
+    AngelicFeather: Talents.t30.AngelicFeather,
+    AngelsMercy: Talents.t30.AngelsMercy,
+    Perseverance: Talents.t30.Perseverance,
 
-    GuardianAngel: Talents.talents_45.GuardianAngel,
-    Afterlife: Talents.talents_45.Afterlife,
-    CosmicRipple: Talents.talents_45.CosmicRipple,
+    GuardianAngel: Talents.t45.GuardianAngel,
+    Afterlife: Talents.t45.Afterlife,
+    CosmicRipple: Talents.t45.CosmicRipple,
 
-    Censure: Talents.talents_60.Censure,
-    ShiningForce: Talents.talents_60.ShiningForce,
-    PsychicVoice: Talents.talents_60.PsychicVoice,
+    Censure: Talents.t60.Censure,
+    ShiningForce: Talents.t60.ShiningForce,
+    PsychicVoice: Talents.t60.PsychicVoice,
 
-    SurgeOfLight: Talents.talents_75.SurgeOfLight,
-    CircleOfHealing: Talents.talents_75.CircleOfHealing,
-    BindingHeal: Talents.talents_75.BindingHeal,
+    SurgeOfLight: Talents.t75.SurgeOfLight,
+    CircleOfHealing: Talents.t75.CircleOfHealing,
+    BindingHeal: Talents.t75.BindingHeal,
 
-    Halo: Talents.talents_90.Halo,
-    Benediction: Talents.talents_90.Benediction,
-    DivineStar: Talents.talents_90.DivineStar,
+    Halo: Talents.t90.Halo,
+    Benediction: Talents.t90.Benediction,
+    DivineStar: Talents.t90.DivineStar,
 
-    LightOfTheNaru: Talents.talents_100.LightOfTheNaaru,
-    HolyWordSalvation: Talents.talents_100.HolyWordSalvation,
-    Apotheosis: Talents.talents_100.Apotheosis,
+    LightOfTheNaru: Talents.t100.LightOfTheNaaru,
+    HolyWordSalvation: Talents.t100.HolyWordSalvation,
+    Apotheosis: Talents.t100.Apotheosis,
 
     // Azerite
     blessedSanctuary: BlessedSanctuary,
@@ -143,9 +150,9 @@ class CombatLogParser extends CoreCombatLogParser {
         title: 'Player Log Data',
         url: 'player-log-data',
         render: () => (
-          <Tab style={{ padding: '15px 22px 15px 15px' }}>
+          <Panel style={{ padding: '15px 22px 15px 15px' }}>
             <HolyPriestSpreadsheet parser={this} />
-          </Tab>
+          </Panel>
         ),
       },
     ];

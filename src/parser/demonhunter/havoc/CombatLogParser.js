@@ -1,5 +1,4 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 
 import EyeBeamNormalizer from './normalizers/EyeBeam';
@@ -28,18 +27,26 @@ import TrailofRuin from './modules/talents/TrailofRuin';
 import FelBarrage from './modules/talents/FelBarrage';
 import FelMastery from './modules/talents/FelMastery';
 import Netherwalk from './modules/talents/Netherwalk';
+import FelEruption from './modules/talents/FelEruption';
+import MasterOfTheGlaives from './modules/talents/MasterOfTheGlaives';
+import DarkSlash from './modules/talents/DarkSlash';
+import CycleOfHatred from './modules/talents/CycleOfHatred';
+import Demonic from './modules/talents/Demonic';
+
 //Resources
 import FuryDetails from './modules/resourcetracker/FuryDetails';
 import FuryTracker from './modules/resourcetracker/FuryTracker';
 
-//Items
-import SoulOfTheSlayer from '../shared/modules/items/SoulOfTheSlayer';
+// Azerite Traits
+import FuriousGaze from './modules/spells/azeritetraits/FuriousGaze';
+import EyesofRage from './modules/spells/azeritetraits/EyesofRage';
+import ChaoticTransformation from './modules/spells/azeritetraits/ChaoticTransformation';
 
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Core Statistics
-    damageDone: [DamageDone, { showStatistic: true }],
     channeling: Channeling,
+
     globalCooldown: GlobalCooldown,
 
     //Normalizer
@@ -67,14 +74,20 @@ class CombatLogParser extends CoreCombatLogParser {
     momentum: Momentum,
     nemesis: Nemesis,
     netherwalk: Netherwalk,
+    felEruption: FelEruption,
+    masterOfTheGlaives: MasterOfTheGlaives,
+    darkSlash: DarkSlash,
+    cycleOfHatred: CycleOfHatred,
+    demonic: Demonic,
 
+    // Azerite Traits
+    furiousGaze: FuriousGaze,
+    eyesofRage: EyesofRage,
+    chaoticTransformation: ChaoticTransformation,
 
     //Resources
     furyTracker: FuryTracker,
     furyDetails: FuryDetails,
-
-    //Items
-    soulOfTheSlayer: SoulOfTheSlayer,
 
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }],

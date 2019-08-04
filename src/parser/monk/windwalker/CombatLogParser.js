@@ -1,6 +1,5 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
 // Features
-import DamageDone from 'parser/shared/modules/DamageDone';
 import GlobalCooldown from './modules/core/GlobalCooldown';
 import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import Abilities from './modules/Abilities';
@@ -22,7 +21,6 @@ import TouchOfDeath from './modules/spells/TouchOfDeath';
 import BlackoutKick from './modules/spells/BlackoutKick';
 // Talents
 import HitCombo from './modules/talents/HitCombo';
-import EnergizingElixir from './modules/talents/EnergizingElixir';
 import Serenity from './modules/talents/Serenity';
 // Azerite
 import GloryOfTheDawn from './modules/spells/azeritetraits/GloryOfTheDawn';
@@ -35,7 +33,6 @@ class CombatLogParser extends CoreCombatLogParser {
     globalCooldown: GlobalCooldown,
 
     // Features
-    damageDone: [DamageDone, { showStatistic: true }],
     alwaysBeCasting: AlwaysBeCasting,
     abilities: Abilities,
     cooldownThroughputTracker: CooldownThroughputTracker,
@@ -48,7 +45,6 @@ class CombatLogParser extends CoreCombatLogParser {
 
     // Talents:
     hitCombo: HitCombo,
-    energizingElixir: EnergizingElixir,
     serenity: Serenity,
 
     // Spells;

@@ -2,23 +2,22 @@ import React from 'react';
 import Analyzer, { SELECTED_PLAYER } from 'parser/core/Analyzer';
 import Events from 'parser/core/Events';
 import StatTracker from 'parser/shared/modules/StatTracker';
+import safeMerge from 'common/safeMerge';
 import SPELLS from 'common/SPELLS';
-import HIT_TYPES from 'game/HIT_TYPES';
-import MAGIC_SCHOOLS from 'game/MAGIC_SCHOOLS';
 import STAT, { getClassNameColor, getIcon, getName } from 'parser/shared/modules/features/STAT';
 import { formatNumber } from 'common/format';
-import Tab from 'interface/others/Tab';
+import Panel from 'interface/statistics/Panel';
 import SpellLink from 'common/SpellLink';
+import Tooltip, { TooltipElement } from 'common/Tooltip';
 import { calculatePrimaryStat, calculateSecondaryStatDefault } from 'common/stats';
+import HIT_TYPES from 'game/HIT_TYPES';
+import MAGIC_SCHOOLS from 'game/MAGIC_SCHOOLS';
 
-import { BASE_AGI } from '../../constants';
-import CelestialFortune from '../spells/CelestialFortune';
 import GiftOfTheOx from '../spells/GiftOfTheOx';
 import MasteryValue from '../core/MasteryValue';
 import Stagger from '../core/Stagger';
-import AgilityValue from './AgilityValue';
 import { diminish, lookupK } from '../constants/Mitigation';
-
+import { BASE_AGI } from '../../constants';
 
 function formatGain(gain) {
   if(typeof gain === 'number') {
@@ -58,12 +57,12 @@ function calculateTotalGain(gain) {
     return low;
   }
 
-  return { 
+  return {
     low, high,
   };
 }
 
-function makeIcon(stat) {
+export function makeIcon(stat) {
   const Icon = getIcon(stat);
   return (
     <Icon
@@ -83,42 +82,24 @@ function calculateLeatherArmorScaling(ilvl, amount, targetIlvl) {
 export default class MitigationSheet extends Analyzer {
   static dependencies = {
     masteryValue: MasteryValue,
-    agilityValue: AgilityValue,
-    cf: CelestialFortune,
     stats: StatTracker,
     stagger: Stagger,
     gotox: GiftOfTheOx,
   };
 
   armorDamageMitigated = 0;
-  versDamageMitigated = 0;
-  versHealing = 0;
 
-  static statsToAvg = ['agility', 'armor', 'versatility', 'mastery', 'crit'];
   _lastStatUpdate = null;
   _avgStats = {};
 
   get masteryDamageMitigated() {
-    return this.masteryValue.expectedMitigation;
+    return this.masteryValue.expectedMitigation - this.masteryValue.noMasteryExpectedMitigation;
   }
 
   get masteryHealing() {
     return this.masteryValue.totalMasteryHealing;
   }
 
-  _critBonusHealing = 0;
-
-  get agiDamageMitigated() {
-    return this.agilityValue.totalAgiPurified;
-  }
-
-  get agiDamageDodged() {
-    return this.masteryValue.expectedMitigation - this.masteryValue.noAgiExpectedDamageMitigated;
-  }
-
-  get agiHealing() {
-    return this.agilityValue.totalAgiHealing;
-  }
 
   get wdpsHealing() {
     return this.gotox.wdpsBonusHealing;
@@ -137,40 +118,10 @@ export default class MitigationSheet extends Analyzer {
     super(...args);
 
     this._lastStatUpdate = this.owner.fight.start_time;
-    this._avgStats = MitigationSheet.statsToAvg.reduce((obj, stat) => {
-      obj[stat] = this.stats._pullStats[stat];
-      return obj;
-    }, {});
 
-    this.addEventListener(Events.heal.by(SELECTED_PLAYER), this._onCritHeal);
-    this.addEventListener(Events.heal.by(SELECTED_PLAYER), this._onHealVers);
     this.addEventListener(Events.damage.to(SELECTED_PLAYER), this._onDamageTaken);
     this.addEventListener('changestats', this._updateStats);
     this.addEventListener(Events.fightend, this._finalizeStats);
-  }
-
-  get bonusCritRatio() {
-    return 1 - this.stats.baseCritPercentage / this.stats.currentCritPercentage;
-  }
-
-  _onCritHeal(event) {
-    if(event.hitType !== HIT_TYPES.CRIT || event.ability.guid === SPELLS.CELESTIAL_FORTUNE_HEAL.id) {
-      return;
-    }
-
-    // counting absorbed healing because we live in a Vectis world
-    const totalHeal = event.amount + (event.overheal || 0) + (event.absorbed || 0);
-    this._critBonusHealing += Math.max(totalHeal / 2 - (event.overheal || 0), 0) * this.bonusCritRatio; // remove overhealing from the bonus healing
-  }
-
-  _onHealVers(event) {
-    if(event.ability.guid === SPELLS.CELESTIAL_FORTUNE_HEAL.id) {
-      return; // CF is unaffected by vers
-    }
-
-    const totalHeal = event.amount + (event.overheal || 0) + (event.absorbed || 0);
-    const originalHeal = totalHeal / (1 + this.stats.currentVersatilityPercentage);
-    this.versHealing += Math.max(totalHeal - originalHeal - (event.overheal || 0), 0);
   }
 
   _onDamageTaken(event) {
@@ -181,15 +132,12 @@ export default class MitigationSheet extends Analyzer {
       this.log('Missing unmitigated amount', event);
       return;
     }
-    let armorMitigated = 0;
-    if(event.ability.type === MAGIC_SCHOOLS.ids.PHYSICAL) {
-      armorMitigated = this._mitigate(event, diminish(this.stats.currentArmorRating, this.K));
+    if(event.ability.type !== MAGIC_SCHOOLS.ids.PHYSICAL) {
+      return;
     }
-    // vers mitigation is half the damage/heal %
-    const versMitigated = this._mitigate(event, this.stats.currentVersatilityPercentage / 2, armorMitigated);
-
+    const armorMitigated = this._mitigate(event, diminish(this.stats.currentArmorRating, this.K));
     this.armorDamageMitigated += armorMitigated;
-    this.versDamageMitigated += versMitigated;
+    event._mitigated = armorMitigated;
   }
 
   _mitigate(event, drPct, alreadyMitigated = 0) {
@@ -205,7 +153,10 @@ export default class MitigationSheet extends Analyzer {
 
     const stats = event.before;
 
-    MitigationSheet.statsToAvg.forEach(stat => {
+    this.statsToAvg.forEach(stat => {
+      if(this._avgStats[stat] === undefined) {
+        this._avgStats[stat] = 0;
+      }
       this._avgStats[stat] += stats[stat] * timeDelta;
     });
   }
@@ -216,7 +167,10 @@ export default class MitigationSheet extends Analyzer {
 
     const stats = this.stats._currentStats;
 
-    MitigationSheet.statsToAvg.forEach(stat => {
+    this.statsToAvg.forEach(stat => {
+      if(this._avgStats[stat] === undefined) {
+        this._avgStats[stat] = 0;
+      }
       this._avgStats[stat] += stats[stat] * timeDelta;
       this._avgStats[stat] /= this.owner.fightDuration;
     });
@@ -231,13 +185,19 @@ export default class MitigationSheet extends Analyzer {
     return amount - fn(Math.floor(this.avgIlvl), amount, Math.floor(this.avgIlvl)-5);
   }
 
-  get results() {
+  /**
+   * Results that haven't yet been moved to other modules.
+   *
+   * DO NOT ADD ANYTHING TO THIS. REMOVE ONLY.
+   */
+  get baseResults() {
     return {
       armor: {
+        priority: 0,
         icon: (
           <img
             src="/img/shield.png"
-            style={{ 
+            style={{
               border: 0,
               marginRight: 10,
             }}
@@ -246,17 +206,18 @@ export default class MitigationSheet extends Analyzer {
         ),
         name: 'Armor',
         className: 'stat-stamina',
-        avg: this._avgStats.armor,
+        statName: 'armor',
         gain: [
           { name: 'Physical Damage Mitigated', amount: this.armorDamageMitigated },
         ],
         increment: this.increment(calculateLeatherArmorScaling, this.stats.startingArmorRating),
       },
       wdps: {
+        priority: 1,
         icon: (
           <img
             src="/img/sword.png"
-            style={{ 
+            style={{
               border: 0,
               marginRight: 10,
             }}
@@ -265,40 +226,22 @@ export default class MitigationSheet extends Analyzer {
         ),
         name: 'Weapon DPS',
         className: 'stat-criticalstrike',
-        avg: this.gotox._wdps,
+        statAmount: this.gotox._wdps,
         gain: [
           { name: <><SpellLink id={SPELLS.GIFT_OF_THE_OX_1.id} /> Healing</>, amount: this.wdpsHealing },
         ],
         increment: calculatePrimaryStat(this.selectedCombatant.mainHand.itemLevel, this.gotox._wdps, this.selectedCombatant.mainHand.itemLevel+5) - this.gotox._wdps,
       },
-      [STAT.AGILITY]: {
-        icon: makeIcon(STAT.AGILITY),
-        name: getName(STAT.AGILITY),
-        className: getClassNameColor(STAT.AGILITY),
-        avg: this._avgStats.agility - BASE_AGI,
-        gain: [
-          { name: <><SpellLink id={SPELLS.GIFT_OF_THE_OX_1.id} /> Healing</>, amount: this.agiHealing },
-          { 
-            name: <dfn data-tip="The amount of damage avoided by dodging may be reduced by purification. This is reflected in the range of values.">Dodge</dfn>, 
-            amount: { 
-              low: this.agiDamageDodged * (1 - this.stagger.pctPurified), 
-              high: this.agiDamageDodged,
-            },
-            isLoaded: this.masteryValue._loaded,
-          },
-          { name: <>Extra <SpellLink id={SPELLS.PURIFYING_BREW.id} /> Effectiveness</>, amount: this.agiDamageMitigated },
-        ],
-        increment: this.increment(calculatePrimaryStat, this.stats.startingAgilityRating),
-      },
       [STAT.MASTERY]: {
+        priority: 3,
         icon: makeIcon(STAT.MASTERY),
         name: getName(STAT.MASTERY),
         className: getClassNameColor(STAT.MASTERY),
-        avg: this._avgStats.mastery,
+        statName: STAT.MASTERY,
         gain: [
           { name: <><SpellLink id={SPELLS.GIFT_OF_THE_OX_1.id} /> Healing</>, amount: this.masteryHealing },
-          { 
-            name: <dfn data-tip="The amount of damage avoided by dodging may be reduced by purification. This is reflected in the range of values.">Dodge</dfn>, 
+          {
+            name: <TooltipElement content="The amount of damage avoided by dodging may be reduced by purification. This is reflected in the range of values.">Dodge</TooltipElement>,
             amount:{
               low: this.masteryDamageMitigated * (1 - this.stagger.pctPurified),
               high: this.masteryDamageMitigated,
@@ -308,102 +251,114 @@ export default class MitigationSheet extends Analyzer {
         ],
         increment: this.increment(calculateSecondaryStatDefault, this.stats.startingMasteryRating),
       },
-      [STAT.VERSATILITY]: {
-        icon: makeIcon(STAT.VERSATILITY),
-        name: getName(STAT.VERSATILITY),
-        className: getClassNameColor(STAT.VERSATILITY),
-        avg: this._avgStats.versatility,
-        gain: [
-          { name: 'Damage Mitigated', amount: this.versDamageMitigated },
-          { name: 'Additional Healing', amount: this.versHealing },
-        ],
-        increment: this.increment(calculateSecondaryStatDefault, this.stats.startingVersatilityRating),
-      },
-      [STAT.CRITICAL_STRIKE]: {
-        icon: makeIcon(STAT.CRITICAL_STRIKE),
-        name: getName(STAT.CRITICAL_STRIKE),
-        className: getClassNameColor(STAT.CRITICAL_STRIKE),
-        avg: this._avgStats.crit,
-        gain: [
-          { name: <><SpellLink id={SPELLS.CELESTIAL_FORTUNE_HEAL.id} /> Healing</>, amount: this.cf.critBonusHealing },
-          { name: 'Critical Heals', amount: this._critBonusHealing },
-        ],
-        increment: this.increment(calculateSecondaryStatDefault, this.stats.startingCritRating),
-      },
     };
   }
 
+  _registeredResults = {};
+
+  registerStat(key, statResults) {
+    if(this._registeredResults[key] !== undefined) {
+      console.warn("Overwriting mitigation stat results for ", key);
+    }
+    this._registeredResults[key] = statResults;
+  }
+
+  get results() {
+    return safeMerge(this.baseResults, this._registeredResults);
+  }
+
+  get statsToAvg() {
+    return Object.values(this.results)
+      .filter(obj => obj.statName !== undefined)
+      .map(({statName}) => statName);
+  }
+
+  avg(stat) {
+    return this._avgStats[stat];
+  }
+
   statEntries() {
-    return Object.entries(this.results).map(([stat, result]) => {
-      const { increment, icon, className, name, avg, gain, tooltip } = result;
+    return Object.entries(this.results)
+      .sort(([_keyA, resultA], [_keyB, resultB]) => resultA.priority - resultB.priority)
+      .map(([stat, result]) => {
+        const { increment, icon, className, name, statName, statAmount, gain, tooltip } = result;
 
-      const totalGain = calculateTotalGain(gain);
-
-      const rows = gain.map(({ name, amount: gain, isLoaded }, i) => {
-        let gainEl;
-        if(isLoaded !== false) {
-          gainEl = formatGain(gain);
-        } else {
-          gainEl = <dfn data-tip="Not Yet Loaded">NYL</dfn>;
+        // some stats are fixed (WDPS). others are calculated via
+        // averaging
+        let avg = statAmount ? statAmount : this.avg(statName);
+        // not sure its worth introducing a "base" parameter when
+        // literally only agi would use it
+        if(statName === 'agility') {
+          avg -= BASE_AGI;
         }
 
-        let perPointEl;
-        if(isLoaded !== false) {
-          perPointEl = formatWeight(gain, avg, this.normalizer, 1);
-        } else {
-          perPointEl = <dfn data-tip="Not Yet Loaded">NYL</dfn>;
-        }
+        const totalGain = calculateTotalGain(gain);
 
-        let valueEl;
-        if(isLoaded !== false) {
-          valueEl = formatWeight(gain, avg, this.normalizer, increment);
-        } else {
-          valueEl = <dfn data-tip="Not Yet Loaded">NYL</dfn>;
-        }
+        const rows = gain.map(({ name, amount: gain, isLoaded }, i) => {
+          let gainEl;
+          if(isLoaded !== false) {
+            gainEl = formatGain(gain);
+          } else {
+            gainEl = <TooltipElement content="Not Yet Loaded">NYL</TooltipElement>;
+          }
+
+          let perPointEl;
+          if(isLoaded !== false) {
+            perPointEl = formatWeight(gain, avg, this.normalizer, 1);
+          } else {
+            perPointEl = <TooltipElement content="Not Yet Loaded">NYL</TooltipElement>;
+          }
+
+          let valueEl;
+          if(isLoaded !== false) {
+            valueEl = formatWeight(gain, avg, this.normalizer, increment);
+          } else {
+            valueEl = <TooltipElement content="Not Yet Loaded">NYL</TooltipElement>;
+          }
+
+          return (
+            <tr key={`${stat}-${i}`}>
+              <td style={{paddingLeft: '5em'}}>
+                {name}
+              </td>
+              <td className="text-right">
+                {gainEl}
+              </td>
+              <td className="text-right">
+                {perPointEl}
+              </td>
+              <td />
+              <td className="text-right">
+                {valueEl}
+              </td>
+            </tr>
+          );
+        });
 
         return (
-          <tr key={`${stat}-${i}`}>
-            <td style={{paddingLeft: '5em'}}>
-              {name}
+          <>
+          <tr key={stat}>
+            <td className={className}>
+              {icon}{' '}
+              {tooltip ? <TooltipElement content={tooltip}>{name}</TooltipElement> : name}
             </td>
             <td className="text-right">
-              {gainEl}
+              <b>{formatGain(totalGain)}</b>
             </td>
             <td className="text-right">
-              {perPointEl}
+              <b>{formatWeight(totalGain, avg, this.normalizer, 1)}</b>
             </td>
-            <td />
             <td className="text-right">
-              {valueEl}
+              <b>&times; {increment.toFixed(2)}</b>
+            </td>
+            <td className="text-right">
+              <b>= {formatWeight(totalGain, avg, this.normalizer, increment)}</b>
             </td>
           </tr>
-        );
-      });
-
-      return (
-        <>
-        <tr key={stat}>
-          <td className={className}>
-              {icon}{' '}
-              {tooltip ? <dfn data-tip={tooltip}>{name}</dfn> : name}
-          </td>
-          <td className="text-right">
-            <b>{formatGain(totalGain)}</b>
-          </td>
-          <td className="text-right">
-            <b>{formatWeight(totalGain, avg, this.normalizer, 1)}</b>
-          </td>
-          <td className="text-right">
-            <b>&times; {increment.toFixed(2)}</b>
-          </td>
-          <td className="text-right">
-            <b>= {formatWeight(totalGain, avg, this.normalizer, increment)}</b>
-          </td>
-        </tr>
-        {rows}
-        </>
+          {rows}
+      </>
       );
-    });
+      });
   }
 
   entries() {
@@ -418,10 +373,10 @@ export default class MitigationSheet extends Analyzer {
             <b>Total</b>
           </th>
           <th className="text-right">
-            <dfn data-tip="The <em>average</em> stat value throughout a fight, including buffs and debuffs, is used here. The value is normalized so that Armor is always 1, and other stats are relative to this."><b>Per Rating (Normalized)</b></dfn>
+            <Tooltip content={<>The <em>average</em> stat value throughout a fight, including buffs and debuffs, is used here. The value is normalized so that Armor is always 1, and other stats are relative to this.</>}><b>Per Rating (Normalized)</b></Tooltip>
           </th>
           <th className="text-right">
-            <dfn data-tip="Amount of rating gained from the last 5 average ilvls of your gear. For secondary stats, this assumes the relative amounts of each stat don't change (as if you upgraded each piece by 5 ilvls without actually changing any of them)."><b>Rating &mdash; Last 5 ilvls</b></dfn>
+            <Tooltip content="Amount of rating gained from the last 5 average ilvls of your gear. For secondary stats, this assumes the relative amounts of each stat don't change (as if you upgraded each piece by 5 ilvls without actually changing any of them)."><b>Rating &mdash; Last 5 ilvls</b></Tooltip>
           </th>
           <th className="text-right">
             <b>Value &mdash; Last 5 ilvls</b>
@@ -435,21 +390,24 @@ export default class MitigationSheet extends Analyzer {
     );
   }
 
-  tab() {
-    return {
-      title: 'Mitigation Values',
-      url: 'mitigation-sheet',
-      render: () => (
-        <Tab>
-          <div style={{ marginTop: -10, marginBottom: -10 }}>
-            <div style={{padding: '1em'}}>Relative value of different stats for mitigation on this specific log measured by <em>Effective Healing</em>. <b>These values are not stat weights, and should not be used with Pawn or other stat-weight addons.</b></div>
-            <div style={{padding: '1em'}}><b>Effective Healing</b> is the amount of damage that was either <em>prevented</em> or <em>healed</em> by an ability. These values are calculated using the actual circumstances of this encounter. While these are informative for understanding the effectiveness of various stats, they may not necessarily be the best way to gear. The stat values are likely to differ based on personal play, fight, raid size, items used, talents chosen, etc.<br /><br />DPS gains are not included in any of the stat values. See <a href="https://github.com/WoWAnalyzer/WoWAnalyzer/blob/master/src/parser/monk/brewmaster/modules/features/MitigationSheet.md">here</a> for more information on valuation methods.</div>
-            <table className="data-table" style={{ marginTop: 10, marginBottom: 10 }}>
-              {this.entries()}
-            </table>
-          </div>
-        </Tab>
-      ),
-    };
+  statistic() {
+    return (
+      <Panel
+        title="Mitigation Values"
+        explanation={(
+          <>
+            Relative value of different stats for mitigation on this specific log measured by <em>Effective Healing</em>. <b>These values are not stat weights, and should not be used with Pawn or other stat-weight addons.</b><br /><br />
+
+            <b>Effective Healing</b> is the amount of damage that was either <em>prevented</em> or <em>healed</em> by an ability. These values are calculated using the actual circumstances of this encounter. While these are informative for understanding the effectiveness of various stats, they may not necessarily be the best way to gear. The stat values are likely to differ based on personal play, fight, raid size, items used, talents chosen, etc.<br /><br />DPS gains are not included in any of the stat values. See <a href="https://github.com/WoWAnalyzer/WoWAnalyzer/blob/master/src/parser/monk/brewmaster/modules/features/MitigationSheet.md">here</a> for more information on valuation methods.
+          </>
+        )}
+        position={200}
+        pad={false}
+      >
+        <table className="data-table">
+          {this.entries()}
+        </table>
+      </Panel>
+    );
   }
 }

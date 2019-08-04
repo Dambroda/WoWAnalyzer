@@ -1,51 +1,48 @@
 language: node_js
-node_js: 10.12
+node_js: '10.12'
 # every second counts
 git:
   depth: 5
 env:
-  - NODE_ENV=production ESLINT_BEFORE_BUILD=false
+  global:
+    - NODE_ENV=production
+    # We may want to run eslint as a separate step in the CI process for improved performance and error reporting when there are eslint issues.
+    - DISABLE_AUTOMATIC_ESLINT=true
 jobs:
   include:
     - stage: test
-      name: "eslint"
+      name: "Check if a changelog entry exists"
+      if: type = pull_request
+      install: true # skip install since it has no dependencies
+      script:
+        - node scripts/require-changelog-entry.js
+    - stage: test
+      name: "code-quality: eslint"
       cache:
         directories:
-          - node_modules
+          - $HOME/.npm
       install:
-        - npm install --dev
+        - npm ci --dev
       script:
         - npm run lint -- --max-warnings=0
     - stage: test
       name: "tests"
       cache:
         directories:
-          - node_modules
+          - $HOME/.npm
       install:
-        - npm install --dev
+        - npm ci --dev
       script:
         - npm run test -- --maxWorkers=2
-    - stage: test
-      name: "server tests"
-      cache:
-        directories:
-          - server/node_modules
-      env:
-        - NODE_ENV=test
-      install:
-        - cd server && npm install --dev && cd ..
-      script:
-        - cd server && npm run test:once -- --maxWorkers=2 && cd ..
-    # TODO: Code duplication calculator
     - stage: build
       language: generic
       services: docker
-      script: docker build -f .docker/production/Dockerfile --tag wowanalyzer .
+      script: docker build --tag wowanalyzer --build-arg REACT_APP_ENVIRONMENT_NAME=$TRAVIS_BRANCH --build-arg REACT_APP_VERSION=$TRAVIS_COMMIT --build-arg DISABLE_AUTOMATIC_ESLINT=true .
       # Reminder: deploy doesn't run on PRs
       deploy:
         provider: script
         skip_cleanup: true
-        script: bash .docker/production/deploy.sh
+        script: bash .travis/deploy.sh
         on:
           all_branches: true
 after_failure:

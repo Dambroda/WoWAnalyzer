@@ -7,27 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700,800" rel="stylesheet">
 <meta property="og:title" content="WoWAnalyzer" />
-<meta property="og:description" content="Use WoWAnalyzer to analyze your performance. Built by community contributors; PRs welcome!" />
+<meta property="og:description" content="Use WoWAnalyzer to analyze your gameplay and get suggestions to become a better raider." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://wowanalyzer.com" />
 <meta property="og:image" content="https://wowanalyzer.com/favicon.png" />
+<meta name="keywords" content="World of Warcraft, WoW, Raiding, Analysis, Gameplay, Performance, MMO, MMORPG, Games, Combatlog, Improving, DPS, Battle for Azeroth, Bosses">
+<!-- Google translate doesn't play well with React (leading to crashes) -->
 <meta name="google" content="notranslate">
-<link rel="search"
-          type="application/opensearchdescription+xml"
-          href=".\search.xml"
-          title="WoWAnalyzer" />
+<link rel="search" type="application/opensearchdescription+xml" href="/search.xml" title="WoWAnalyzer" />
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=es6,Object.values,Object.entries,fetch,Array.prototype.includes,String.prototype.includes,Intl&unknown=polyfill"></script>
-<script async src="https://ga.wowanalyzer.com/gtag/js?id=UA-132937713-1"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'UA-132937713-1');
-</script>
 
 <style type="text/css">
 #splash {
@@ -88,7 +80,23 @@ gtag('config', 'UA-132937713-1');
   </div>
 </div>
 
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces2015%2Ces2016%2Ces2017%2Cfetch%2CIntl"></script>
+<script src="https://browser.sentry-cdn.com/5.5.0/bundle.min.js" crossorigin="anonymous"></script>
+<script>
+window.Sentry && Sentry.init({
+  dsn: '%REACT_APP_SENTRY_DSN%',
+  release: 'wowanalyzer@%REACT_APP_VERSION%',
+  environment: '%REACT_APP_ENVIRONMENT_NAME%',
+});
+</script>
+<script async src="https://ga.wowanalyzer.com/gtag/js?id=UA-132937713-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-132937713-1');
+</script>
+
 </body>
 
 </html>

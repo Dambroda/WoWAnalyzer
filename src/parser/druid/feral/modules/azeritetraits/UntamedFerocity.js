@@ -9,7 +9,8 @@ import Enemies from 'parser/shared/modules/Enemies';
 import StatTracker from 'parser/shared/modules/StatTracker';
 import SpellUsable from 'parser/shared/modules/SpellUsable';
 import calculateBonusAzeriteDamage from 'parser/core/calculateBonusAzeriteDamage';
-import TraitStatisticBox, { STATISTIC_ORDER } from 'interface/others/TraitStatisticBox';
+import ItemStatistic from 'interface/statistics/ItemStatistic';
+import BoringSpellValueText from 'interface/statistics/components/BoringSpellValueText';
 import ItemDamageDone from 'interface/others/ItemDamageDone';
 
 import { calcShredBonus, calcSwipeBonus, isAffectedByWildFleshrending } from '../azeritetraits/WildFleshrending';
@@ -45,6 +46,8 @@ export function calcBonus(combatant) {
  * Untamed Ferocity
  * Combo-point generating abilities deal X additional instant damage and reduce the cooldown of
  * Berserk by 0.3 sec [or Incarnation: King of the Jungle by 0.2 sec]
+ * 
+ * Test Log: /report/ABH7D8W1Qaqv96mt/2-Mythic+Taloc+-+Kill+(4:12)/Enicat/statistics
  */
 class UntamedFerocity extends Analyzer {
   static dependencies = {
@@ -99,7 +102,7 @@ class UntamedFerocity extends Analyzer {
       // only interested in direct damage from whitelisted spells which hit the target
       return;
     }
-    
+
     if (this.hasWildFleshrending && isAffectedByWildFleshrending(event, this.owner, this.enemies)) {
       // if the ability was given bonus damage from both Wild Fleshrending and Untamed Ferocity need to account for that to accurately attribute damage to each.
       const fleshrendingBonus = (event.ability.guid === SPELLS.SHRED.id) ? this.shredBonus : this.swipeBonus;
@@ -126,22 +129,24 @@ class UntamedFerocity extends Analyzer {
     const basePossibleCasts = Math.floor(this.owner.fightDuration / cooldownDuration) + 1;
     const improvedPossibleCasts = Math.floor((this.owner.fightDuration + this.cooldownReduction) / cooldownDuration) + 1;
     const extraCastsPossible = improvedPossibleCasts - basePossibleCasts;
-    const extraCastsComment = (improvedPossibleCasts === basePossibleCasts) ? `This wasn't enough to allow any extra casts during the fight, but may have given you more freedom in timing those casts.` : `This gave you the opportunity over the duration of the fight to use ${cooldownName} <b>${extraCastsPossible}</b> extra time${extraCastsPossible === 1 ? '' : 's'}.`;
-
+    const extraCastsComment = (improvedPossibleCasts === basePossibleCasts) ? `This wasn't enough to allow any extra casts during the fight, but may have given you more freedom in timing those casts.` : <>This gave you the opportunity over the duration of the fight to use {cooldownName} <b>{extraCastsPossible}</b> extra time{extraCastsPossible === 1 ? '' : 's'}.</>;
+    
     return (
-      <TraitStatisticBox
-        position={STATISTIC_ORDER.OPTIONAL()}
-        trait={SPELLS.UNTAMED_FEROCITY.id}
-        value={(
+      <ItemStatistic
+        size="flexible"
+        tooltip={(
           <>
-          <ItemDamageDone amount={this.untamedDamage} /><br />
-          {(this.cooldownReduction / 1000).toFixed(1)} seconds cooldown reduction
+            Increased the damage of your combo point generators by a total of <b>{formatNumber(this.untamedDamage)}</b><br />
+            The cooldown on your {cooldownName} was reduced by a total of <b>{(this.cooldownReduction / 1000).toFixed(1)}</b> seconds.<br />
+            {extraCastsComment}
           </>
         )}
-        tooltip={`Increased the damage of your combo point generators by a total of <b>${formatNumber(this.untamedDamage)}</b><br />
-          The cooldown on your ${cooldownName} was reduced by a total of <b>${(this.cooldownReduction / 1000).toFixed(1)}</b> seconds.<br />
-          ${extraCastsComment}`}
-      />
+      >
+        <BoringSpellValueText spell={SPELLS.UNTAMED_FEROCITY}>
+          <ItemDamageDone amount={this.untamedDamage} /><br />
+          {(this.cooldownReduction / 1000).toFixed(1)}s <small>cooldown reduction</small>
+        </BoringSpellValueText>
+      </ItemStatistic>
     );
   }
 }

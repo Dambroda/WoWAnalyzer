@@ -36,6 +36,7 @@ class RuneTracker extends ResourceTracker {
   runesReady = []; //{x, y} points of {time, runeCount} for the chart
   _runesReadySum; //time spent at each rune. _runesReadySum[1] is time spent at one rune available.
   _lastTimestamp; //used to find time since last rune change for the _runesReadySum
+  _fightend = false; //fightend, avoid wierd graph by not adding later runes
 
   constructor(...args) {
     super(...args);
@@ -48,6 +49,8 @@ class RuneTracker extends ResourceTracker {
   }
   on_fightend() { //add a last event for calculating uptimes and make the chart not end early.
     const runesAvailable = this.runesAvailable;
+    this._fightend = true;
+
     this.runesReady.push({ x: this.owner.fightDuration, y: runesAvailable });
     this._runesReadySum[runesAvailable] += this.owner.fight.end_time - this._lastTimestamp;
     this.addPassiveRuneRegeneration();
@@ -69,7 +72,7 @@ class RuneTracker extends ResourceTracker {
           return;
         }
         for (let i = 0; i < runeCost; i++) { //start rune cooldown
-          this.startCooldown();
+          this.startCooldown(event);
         }
       });
   }
@@ -112,10 +115,16 @@ class RuneTracker extends ResourceTracker {
     } else { //no change
       return;
     }
+
     //time since last rune change was spent at current runes minus the change.
     this._runesReadySum[this.runesAvailable - change] += event.timestamp - this._lastTimestamp;
     this._lastTimestamp = event.timestamp;
     //Adding two points to the rune chart, one at {time, lastRuneCount} and one at {time, newRuneCount} so the chart does not have diagonal lines.
+
+    if (this._fightend) {
+      return;
+    }
+
     this.runesReady.push({ x: this.timeFromStart(event.timestamp), y: this.runesAvailable - change });
     this.runesReady.push({ x: this.timeFromStart(event.timestamp), y: this.runesAvailable });
   }
@@ -164,13 +173,13 @@ class RuneTracker extends ResourceTracker {
     if (!this.spellUsable.isOnCooldown(runeId)) {
       return;
     }
-    const expectedCooldown = this.abilities.getExpectedCooldownDuration(runeId);
+    const expectedCooldown = this.abilities.getExpectedCooldownDuration(runeId, this.spellUsable.cooldownTriggerEvent(runeId));
     this.spellUsable.reduceCooldown(runeId, expectedCooldown);
   }
 
-  startCooldown() {
+  startCooldown(event) {
     const runeId = this.shortestCooldown;
-    this.spellUsable.beginCooldown(runeId);
+    this.spellUsable.beginCooldown(runeId, event);
   }
 
   get shortestCooldown() {
@@ -179,8 +188,7 @@ class RuneTracker extends ResourceTracker {
     const runeThreeCooldown = this.getCooldown(SPELLS.RUNE_3.id) || 0;
     if (runeOneCooldown <= runeTwoCooldown && runeOneCooldown <= runeThreeCooldown) {
       return SPELLS.RUNE_1.id;
-    }
-    else if (runeTwoCooldown <= runeThreeCooldown) {
+    } else if (runeTwoCooldown <= runeThreeCooldown) {
       return SPELLS.RUNE_2.id;
     } else {
       return SPELLS.RUNE_3.id;
@@ -193,8 +201,7 @@ class RuneTracker extends ResourceTracker {
     const runeThreeCooldown = this.getCooldown(SPELLS.RUNE_3.id) || 0;
     if (runeOneCooldown >= runeTwoCooldown && runeOneCooldown >= runeThreeCooldown) {
       return SPELLS.RUNE_1.id;
-    }
-    else if (runeTwoCooldown >= runeThreeCooldown) {
+    } else if (runeTwoCooldown >= runeThreeCooldown) {
       return SPELLS.RUNE_2.id;
     } else {
       return SPELLS.RUNE_3.id;
@@ -215,7 +222,7 @@ class RuneTracker extends ResourceTracker {
     }
     const chargesOnCooldown = 2 - this.spellUsable.chargesAvailable(spellId);
     const cooldownRemaining = this.spellUsable.cooldownRemaining(spellId);
-    const fullChargeCooldown = this.abilities.getExpectedCooldownDuration(spellId);
+    const fullChargeCooldown = this.abilities.getExpectedCooldownDuration(spellId, this.spellUsable.cooldownTriggerEvent(spellId));
     return (chargesOnCooldown - 1) * fullChargeCooldown + cooldownRemaining;
   }
 
@@ -295,11 +302,13 @@ class RuneTracker extends ResourceTracker {
         icon={<SpellIcon id={SPELLS.RUNE_1.id} noLink />}
         value={`${formatPercentage(1 - this.runeEfficiency)} %`}
         label="Runes overcapped"
-        tooltip={`
-          Number of runes wasted: ${formatNumber(this.runesWasted)} <br>
-          These numbers only include runes wasted from passive regeneration. <br>
-          The table below shows the time spent at any given number of runes available.
-        `}
+        tooltip={(
+          <>
+            Number of runes wasted: {formatNumber(this.runesWasted)} <br />
+            These numbers only include runes wasted from passive regeneration. <br />
+            The table below shows the time spent at any given number of runes available.
+          </>
+        )}
       >
         <table className="table table-condensed">
           <thead>

@@ -8,6 +8,11 @@ export default {
   // -------------
   // Shared spells
   // -------------
+  SOUL_SHARDS: {
+    id: 246985,
+    name: 'Soul Shards',
+    icon: 'inv_misc_gem_amethyst_02',
+  },
   BANISH: {
     id: 710,
     name: 'Banish',
@@ -365,6 +370,11 @@ export default {
     name: 'Dreadbite',
     icon: 'spell_warlock_calldreadstalkers',
   },
+  SHARPENED_DREADFANGS: {
+    id: 215111,
+    name: 'Sharpened Dreadfangs',
+    icon: 'inv_feldreadravenmount',
+  },
   FEL_FIREBOLT: {
     id: 104318,
     name: 'Fel Firebolt',
@@ -375,6 +385,7 @@ export default {
     name: 'Demonfire',
     icon: 'ability_vehicle_demolisherflamecatapult',
   },
+
   VILEFIEND_BILE_SPIT: {
     id: 267997,
     name: 'Bile Spit',
@@ -461,6 +472,11 @@ export default {
   DEMONIC_CONSUMPTION_BUFF: {
     id: 267972,
     name: 'Demonic Consumption',
+    icon: 'spell_warlock_soulburn',
+  },
+  DEMONIC_CONSUMPTION_CAST: {
+    id: 267971,
+    name: 'Demonic Consumption(cast)',
     icon: 'spell_warlock_soulburn',
   },
 

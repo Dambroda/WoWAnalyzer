@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Trans, t } from '@lingui/macro';
 
 import FullscreenError from 'interface/common/FullscreenError';
 import ErrorBoundary from 'interface/common/ErrorBoundary';
 import ApiDownBackground from 'interface/common/images/api-down-background.gif';
+import { EventsParseError } from 'interface/report/EventParser';
+import { i18n } from 'interface/RootLocalizationProvider';
 
 class RootErrorBoundary extends React.Component {
   static propTypes = {
@@ -30,19 +33,35 @@ class RootErrorBoundary extends React.Component {
   }
 
   handleErrorEvent(event) {
-    this.error(event);
+    const { error } = event;
+    // XXX Ignore errors that will be processed by componentDidCatch.
+    // SEE: https://github.com/facebook/react/issues/10474
+    if (error && error.stack && error.stack.includes('invokeGuardedCallbackDev')) {
+      return;
+    }
+    console.log('Caught a global error');
+    this.error(error, 'error');
   }
   handleUnhandledrejectionEvent(event) {
-    this.error(event.reason);
+    console.log('Caught a global unhandledrejection');
+    this.error(event.reason, 'unhandledrejection');
   }
 
   error(error, details = null) {
+    // NOTE: These filters only prevent the error state from being triggered. Sentry automatically logs them regardless.
+    // filename may not be set, according to MDN its support is shitty but it doesn't specify how shitty. It works in Chromium
+    const isExternalFile = error.filename && !error.filename.includes(window.location.origin);
+    if (isExternalFile) {
+      return;
+    }
+    // TODO: We could also check if location.origin is in stack, as the stack trace may only contain it for local files
     if (error && error.message === 'Script error.') {
       // Some errors are triggered by third party scripts, such as browser plug-ins. These errors should generally not affect the application, so we can safely ignore them for our error handling. If a plug-in like Google Translate messes with the DOM and that breaks the app, that triggers a different error so those third party issues are still handled.
+      console.log('Ignored because it looks like a third party error.');
       return;
     }
 
-    window.lastError = error;
+    (window.errors = window.errors || []).push(error);
 
     this.setState({
       error: error,
@@ -52,10 +71,20 @@ class RootErrorBoundary extends React.Component {
 
   render() {
     if (this.state.error) {
+      if (this.state.error instanceof EventsParseError) {
+        return (
+          <FullscreenError
+            error={i18n._(t`An error occured during analysis`)}
+            details={i18n._(t`We fucked up and our code broke like the motherfucker that it is. Please let us know on Discord and we will fix it for you.`)}
+            background="https://media.giphy.com/media/2sdHZ0iBuI45s6fqc9/giphy.gif"
+          />
+        );
+      }
+
       return (
         <FullscreenError
-          error="An error occured."
-          details="An unexpected error occured in the app. Please try again."
+          error={<Trans>An error occured.</Trans>}
+          details={<Trans>An unexpected error occured in the app. Please try again.</Trans>}
           background={ApiDownBackground}
           errorDetails={(
             <>
@@ -72,7 +101,7 @@ class RootErrorBoundary extends React.Component {
           )}
         >
           <div className="text-muted">
-            This is usually caused by a bug, please let us know about the issue on GitHub or Discord so we can fix it.
+            <Trans>This is usually caused by a bug, please let us know about the issue on GitHub or Discord so we can fix it.</Trans>
           </div>
         </FullscreenError>
       );

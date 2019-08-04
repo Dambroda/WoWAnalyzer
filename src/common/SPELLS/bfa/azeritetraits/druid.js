@@ -74,6 +74,36 @@ export default {
     name: 'Untamed Ferocity',
     icon: 'ability_druid_disembowel',
   },
+  JUNGLE_FURY_TRAIT: {
+    id: 274424,
+    name: 'Jungle Fury',
+    icon: 'ability_mount_jungletiger',
+  },
+  JUNGLE_FURY_BUFF: {
+    id: 274426,
+    name: 'Jungle Fury',
+    icon: 'ability_mount_jungletiger',
+  },
+  IRON_JAWS_TRAIT: {
+    id: 276021,
+    name: 'Iron Jaws',
+    icon: 'ability_druid_mangle',
+  },
+  IRON_JAWS_BUFF: {
+    id: 276026,
+    name: 'Iron Jaws',
+    icon: 'inv_misc_bone_09',
+  },
+  GUSHING_LACERATIONS_TRAIT: {
+    id: 278509,
+    name: 'Gushing Lacerations',
+    icon: 'ability_ghoulfrenzy',
+  },
+  GUSHING_LACERATIONS_PROC: {
+    id: 279471,
+    name: 'Gushing Lacerations',
+    icon: 'ability_ghoulfrenzy',
+  },
   MASTERFUL_INSTINCTS: {
     id: 273344,
     name: 'Masterful Instincts',
@@ -99,4 +129,42 @@ export default {
     name: 'Layered Mane',
     icon: 'ability_druid_ironfur',
   },
+
+  //start of balance traits
+  DAWNING_SUN:{
+    id: 276152,
+    name: 'Dawning Sun',
+    icon: 'spell_arcane_starfire',
+  },
+  DAWNING_SUN_BUFF:{
+      id: 276154,
+      name: 'Dawning Sun',
+      icon: 'spell_arcane_starfire',
+  },
+  HIGH_NOON:{
+    id: 278505,
+    name: 'High Noon',
+    icon: 'ability_mage_firestarter',
+  },
+  POWER_OF_THE_MOON:{
+    id: 273367,
+    name: 'Power of the Moon',
+    icon: 'spell_nature_starfall',
+  },
+  STREAKING_STARS:{
+    id: 272871,
+    name: 'Streaking Stars',
+    icon: 'spell_nature_natureguardian',
+  },
+  ARCANIC_PULSAR:{
+    id: 287784,
+    name: 'Arcanic Pulsar',
+    icon: 'spell_arcane_arcane03',
+  },
+  ARCANIC_PULSAR_BUFF:{
+    id: 287790,
+    name: 'Arcanic Pulsar',
+    icon: 'spell_arcane_arcane03',
+  },
+  //end of balance
 };

@@ -1,5 +1,4 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 
 import Abilities from './modules/features/Abilities';
@@ -8,7 +7,7 @@ import CooldownThroughputTracker from './modules/features/CooldownThroughputTrac
 import Felstorm from './modules/features/Felstorm';
 import Checklist from './modules/features/Checklist/Module';
 import SummonDemonicTyrant from './modules/features/SummonDemonicTyrant';
-
+import LegionStrike from './modules/features/LegionStrike';
 
 import SoulShardTracker from './modules/soulshards/SoulShardTracker';
 import SoulShardDetails from './modules/soulshards/SoulShardDetails';
@@ -22,6 +21,7 @@ import DemonicTyrantHandler from './modules/pets/DemoPets/DemonicTyrantHandler';
 import ImplosionHandler from './modules/pets/DemoPets/ImplosionHandler';
 import PetTimelineTab from './modules/pets/PetTimelineTab';
 import PrepullPetNormalizer from './modules/pets/normalizers/PrepullPetNormalizer';
+import SummonOrderNormalizer from './modules/pets/normalizers/SummonOrderNormalizer';
 
 import PowerSiphonNormalizer from './modules/talents/normalizers/PowerSiphonNormalizer';
 
@@ -55,10 +55,10 @@ class CombatLogParser extends CoreCombatLogParser {
     abilities: Abilities,
     alwaysBeCasting: AlwaysBeCasting,
     cooldownThroughputTracker: CooldownThroughputTracker,
-    damageDone: [DamageDone, { showStatistic: true }],
     felstorm: Felstorm,
     checklist: Checklist,
     summonDemonicTyrant: SummonDemonicTyrant,
+    legionStrike: LegionStrike,
 
     // Core
     soulShardTracker: SoulShardTracker,
@@ -73,6 +73,7 @@ class CombatLogParser extends CoreCombatLogParser {
     demonicTyrantHandler: DemonicTyrantHandler,
     implosionHandler: ImplosionHandler,
     petTimelineTab: PetTimelineTab,
+    summonOrderNormalizer: SummonOrderNormalizer,
     prepullPetNormalizer: PrepullPetNormalizer,
 
     // Normalizers
@@ -103,7 +104,7 @@ class CombatLogParser extends CoreCombatLogParser {
     supremeCommander: SupremeCommander,
     shadowsBite: ShadowsBite,
     balefulInvocation: BalefulInvocation,
-    
+
     // There's no throughput benefit from casting Arcane Torrent on cooldown
     arcaneTorrent: [ArcaneTorrent, { castEfficiency: null }],
   };

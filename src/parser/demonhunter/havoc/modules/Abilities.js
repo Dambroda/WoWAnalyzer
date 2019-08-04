@@ -3,7 +3,6 @@ import React from 'react';
 import SPELLS from 'common/SPELLS';
 import SpellLink from 'common/SpellLink';
 import CoreAbilities from 'parser/core/modules/Abilities';
-import calculateMaxCasts from 'parser/core/calculateMaxCasts';
 
 class Abilities extends CoreAbilities {
   spellbook() {
@@ -33,7 +32,7 @@ class Abilities extends CoreAbilities {
         },
       },
       {
-        spell: SPELLS.BLADE_DANCE,
+        spell: [SPELLS.BLADE_DANCE, SPELLS.DEATH_SWEEP],
         category: combatant.hasTalent(SPELLS.FIRST_BLOOD_TALENT.id) ? Abilities.SPELL_CATEGORIES.ROTATIONAL : Abilities.SPELL_CATEGORIES.ROTATIONAL_AOE,
         cooldown: haste => 9 / (1 + haste),
         gcd: {
@@ -41,23 +40,8 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: combatant.hasTalent(SPELLS.FIRST_BLOOD_TALENT.id),
-          recommendedEfficiency: 0.85,
-          maxCasts: cooldown => calculateMaxCasts(cooldown, this.owner.fightDuration - combatant.getBuffUptime(SPELLS.METAMORPHOSIS_HAVOC_BUFF.id)),
-          extraSuggestion: <>This should be part of your single target rotation due to the <SpellLink id={SPELLS.FIRST_BLOOD_TALENT.id} icon /> talent.</>,
-        },
-      },
-      {
-        spell: SPELLS.DEATH_SWEEP, //During meta blade dance becomes this.
-        category: combatant.hasTalent(SPELLS.FIRST_BLOOD_TALENT.id) ? Abilities.SPELL_CATEGORIES.ROTATIONAL : Abilities.SPELL_CATEGORIES.ROTATIONAL_AOE,
-        cooldown: haste => 9 / (1 + haste),
-        gcd: {
-          base: 1500,
-        },
-        castEfficiency: {
-          suggestion: combatant.hasTalent(SPELLS.FIRST_BLOOD_TALENT.id),
-          recommendedEfficiency: 0.85,
-          maxCasts: cooldown => calculateMaxCasts(cooldown, combatant.getBuffUptime(SPELLS.METAMORPHOSIS_HAVOC_BUFF.id)),
-          extraSuggestion: <>This should be part of your single target rotation due to the <SpellLink id={SPELLS.FIRST_BLOOD_TALENT.id} icon /> talent.</>,
+          recommendedEfficiency: 0.95,
+          extraSuggestion: <>This should be part of your single target rotation due to the <SpellLink id={SPELLS.FIRST_BLOOD_TALENT.id} /> talent. This includes the <SpellLink id={SPELLS.DEATH_SWEEP.id} /> casts since they are the same ability and share their cooldowns.</>,
         },
       },
       {
@@ -71,7 +55,7 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: true,
-          recommendedEfficiency: 0.85,
+          recommendedEfficiency: 0.95,
           extraSuggestion: 'This is an important Fury generator spell. Try to always cast on cooldown, but beware to not waste the Fury generation it provides. And also it can be used to charge to the desired target, making it very strong movement spell.',
         },
       },
@@ -87,7 +71,7 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: true,
-          recommendedEfficiency: 0.85,
+          recommendedEfficiency: 0.95,
           extraSuggestion: 'This is an important Fury generator spell. Try to always cast on cooldown, but beware to not waste the Fury generation it provides.',
         },
       },
@@ -101,8 +85,8 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: true,
-          recommendedEfficiency: 0.85,
-          extraSuggestion: <>Pool your fury before hand to maximizing casting <SpellLink id={SPELLS.CHAOS_STRIKE.id} icon /> / <SpellLink id={SPELLS.ANNIHILATION.id} icon /> during its buff window.</>,
+          recommendedEfficiency: 0.95,
+          extraSuggestion: <>Pool your Fury before hand to maximizing casting <SpellLink id={SPELLS.CHAOS_STRIKE.id} /> / <SpellLink id={SPELLS.ANNIHILATION.id} /> during its buff window.</>,
         },
       },
       {
@@ -126,8 +110,8 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: combatant.hasTalent(SPELLS.MOMENTUM_TALENT.id),
-          recommendedEfficiency: 0.85,
-          extraSuggestion: <>Use it to keep your <SpellLink id={SPELLS.MOMENTUM_TALENT.id} icon /> buff going.</>,
+          recommendedEfficiency: 0.95,
+          extraSuggestion: <>Use it to keep your <SpellLink id={SPELLS.MOMENTUM_TALENT.id} /> buff going.</>,
         },
       },
       {
@@ -138,8 +122,8 @@ class Abilities extends CoreAbilities {
         gcd: null,
         castEfficiency: {
           suggestion: combatant.hasTalent(SPELLS.MOMENTUM_TALENT.id),
-          recommendedEfficiency: 0.85,
-          extraSuggestion: <>Use it to generate fury due to the <SpellLink id={SPELLS.MOMENTUM_TALENT.id} icon /> talent.</>,
+          recommendedEfficiency: 0.95,
+          extraSuggestion: <>Use it to generate Fury due to the <SpellLink id={SPELLS.MOMENTUM_TALENT.id} /> talent.</>,
         },
       },
       {
@@ -223,7 +207,7 @@ class Abilities extends CoreAbilities {
         },
         castEfficiency: {
           suggestion: true,
-          recommendedEfficiency: 0.85,
+          recommendedEfficiency: 0.95,
           extraSuggestion: `This is a great AoE damage spell, but also does a great damage on single target. You should cast it as soon as it gets off cooldown. The only moment you can delay it's cast is if you already expect an add wave to maximize it's efficiency and damage output.`,
         },
       },

@@ -1,10 +1,10 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 
 import Abilities from './modules/Abilities';
 import Overload from './modules/features/Overload';
 
 import FlameShock from './modules/core/FlameShock';
+import LavaSurge from './modules/core/LavaSurge';
 import StormFireElemental from './modules/features/StormFireElemental';
 
 import Aftershock from './modules/talents/Aftershock';
@@ -21,10 +21,11 @@ import TotemMastery from './modules/talents/TotemMastery';
 import UnlimitedPower from './modules/talents/UnlimitedPower';
 import UnlimitedPowerTimesByStacks from './modules/talents/UnlimitedPowerTimesByStacks';
 import Checklist from './modules/checklist/Module';
+import Buffs from './modules/Buffs';
 
 import EchoOfTheElementals from './modules/azerite/EchoOfTheElementals';
 import LavaShock from './modules/azerite/LavaShock';
-import SynapseShock from './modules/azerite/SynapseShock';
+import SynapseShock from '../shared/azerite/SynapseShock';
 
 import SpiritWolf from '../shared/talents/SpiritWolf';
 import StaticCharge from '../shared/talents/StaticCharge';
@@ -32,22 +33,22 @@ import AnkhNormalizer from '../shared/normalizers/AnkhNormalizer';
 import AstralShift from '../shared/spells/AstralShift';
 import PackSpirit from '../shared/azerite/PackSpirit';
 import SereneSpirit from '../shared/azerite/SereneSpirit';
+import IgneousPotential from '../shared/azerite/IgneousPotential';
 
 //Resources
 import MaelstromDetails from '../shared/maelstromchart/MaelstromDetails';
 import MaelstromTracker from '../shared/maelstromchart/MaelstromTracker';
 import MaelstromTab from '../shared/maelstromchart/MaelstromTab';
 
-
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
-    damageDone: [DamageDone, { showStatistic: true }],
-
     // Features
     abilities: Abilities,
     flameShock: FlameShock,
+    lavaSurge: LavaSurge,
     overload: Overload,
     stormfireElemental: StormFireElemental,
+    buffs: Buffs,
 
     // Talents
     aftershock: Aftershock,
@@ -79,7 +80,7 @@ class CombatLogParser extends CoreCombatLogParser {
     astralShift: AstralShift,
     packSpirit: PackSpirit,
     sereneSpirit: SereneSpirit,
-
+    igneousPotential: IgneousPotential,
   };
 
 }

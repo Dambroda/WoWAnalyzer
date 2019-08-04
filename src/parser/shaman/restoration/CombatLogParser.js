@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Tab from 'interface/others/Tab';
+import Panel from 'interface/others/Panel';
 import RestorationShamanSpreadsheet from 'interface/others/RestorationShamanSpreadsheet';
 import Feeding from 'interface/others/Feeding';
 
@@ -8,6 +8,9 @@ import CoreCombatLogParser from 'parser/core/CombatLogParser';
 import HealingEfficiencyDetails from 'parser/core/healingEfficiency/HealingEfficiencyDetails';
 import ManaTracker from 'parser/core/healingEfficiency/ManaTracker';
 import LowHealthHealing from 'parser/shared/modules/features/LowHealthHealing';
+import ManaLevelChart from 'parser/shared/modules/resources/mana/ManaLevelChart';
+import ManaUsageChart from 'parser/shared/modules/resources/mana/ManaUsageChart';
+
 import HealingEfficiencyTracker from './modules/core/HealingEfficiencyTracker';
 import Abilities from './modules/Abilities';
 
@@ -60,6 +63,8 @@ import StaticCharge from '../shared/talents/StaticCharge';
 import AstralShift from '../shared/spells/AstralShift';
 import PackSpirit from '../shared/azerite/PackSpirit';
 import SereneSpirit from '../shared/azerite/SereneSpirit';
+import SynapseShock from '../shared/azerite/SynapseShock';
+import IgneousPotential from '../shared/azerite/IgneousPotential';
 
 import CloudburstNormalizer from './normalizers/CloudburstNormalizer';
 
@@ -72,12 +77,16 @@ class CombatLogParser extends CoreCombatLogParser {
     // Override the ability tracker so we also get stats for Tidal Waves and beacon healing
     abilityTracker: ShamanAbilityTracker,
     lowHealthHealing: LowHealthHealing,
-    healingDone: [HealingDone, { showStatistic: true }],
+    healingDone: HealingDone,
     abilities: Abilities,
     healingRainLocation: HealingRainLocation,
     manaTracker: ManaTracker,
     hpmDetails: HealingEfficiencyDetails,
     hpmTracker: HealingEfficiencyTracker,
+
+    // Generic healer things
+    manaLevelChart: ManaLevelChart,
+    manaUsageChart: ManaUsageChart,
 
     // Features
     alwaysBeCasting: AlwaysBeCasting,
@@ -121,6 +130,8 @@ class CombatLogParser extends CoreCombatLogParser {
     overflowingShores: OverflowingShores,
     spoutingSpirits: SpoutingSpirits,
     surgingTides: SurgingTides,
+    synapseShock: SynapseShock,
+    igneousPotential: IgneousPotential,
 
     // Shared:
     spiritWolf: SpiritWolf,
@@ -142,20 +153,20 @@ class CombatLogParser extends CoreCombatLogParser {
         title: 'Player Log Data',
         url: 'player-log-data',
         render: () => (
-          <Tab style={{ padding: '15px 22px 15px 15px' }}>
+          <Panel style={{ padding: '15px 22px 15px 15px' }}>
             <RestorationShamanSpreadsheet parser={this} />
-          </Tab>
+          </Panel>
         ),
       },
       {
         title: 'Feeding',
         url: 'feeding',
         render: () => (
-          <Tab style={{ padding: 0 }}>
+          <Panel style={{ padding: 0 }}>
             <Feeding
               cooldownThroughputTracker={this.getModule(CooldownThroughputTracker)}
             />
-          </Tab>
+          </Panel>
         ),
       },
     ];

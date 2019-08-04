@@ -1,9 +1,9 @@
 import React from 'react';
 
-import BaseModule from 'parser/shared/modules/features/Checklist2/Module';
+import BaseModule from 'parser/shared/modules/features/Checklist/Module';
 import CastEfficiency from 'parser/shared/modules/CastEfficiency';
 import Combatants from 'parser/shared/modules/Combatants';
-import PreparationRuleAnalyzer from 'parser/shared/modules/features/Checklist2/PreparationRuleAnalyzer';
+import PreparationRuleAnalyzer from 'parser/shared/modules/features/Checklist/PreparationRuleAnalyzer';
 
 import CancelledCasts from '../CancelledCasts';
 import AlwaysBeCasting from '../AlwaysBeCasting';
@@ -16,6 +16,10 @@ import EarlyDotRefreshes from '../EarlyDotRefreshes';
 import EarlyDotRefreshesInstants from '../EarlyDotRefreshesInstants';
 
 import AstralPowerDetails from '../../resourcetracker/AstralPowerDetails';
+
+import DawningSun from '../../talents/azeritetraits/DawningSun';
+import HighNoon from '../../talents/azeritetraits/HighNoon';
+import PowerOfTheMoon from '../../talents/azeritetraits/PowerOfTheMoon';
 
 import Component from './Component';
 
@@ -34,6 +38,9 @@ class Checklist extends BaseModule {
     earlyDotRefreshes: EarlyDotRefreshes,
     earlyDotRefreshesInstants: EarlyDotRefreshesInstants,
     astralPowerDetails: AstralPowerDetails,
+    dawningSun: DawningSun,
+    highNoon: HighNoon,
+    powerOfTheMoon: PowerOfTheMoon,
   };
 
   render() {

@@ -26,7 +26,6 @@ class BoomingVoice extends Analyzer {
   constructor(...args) {
     super(...args);
     this.active = this.selectedCombatant.hasTalent(SPELLS.BOOMING_VOICE_TALENT.id);
-    this.maxRage += this.selectedCombatant.traitsBySpellId[SPELLS.INTOLERANCE_TRAIT.id] * 10;
   }
 
   on_byPlayer_cast(event) {
@@ -90,8 +89,12 @@ class BoomingVoice extends Analyzer {
         icon={<SpellIcon id={SPELLS.BOOMING_VOICE_TALENT.id} />}
         value={`${this.rageGenerated}`}
         label="Rage generated"
-        tooltip={`${formatNumber(this.bonusDmg)} damage contributed<br/>${this.rageWasted} Rage wasted
-        `}
+        tooltip={(
+          <>
+            {formatNumber(this.bonusDmg)} damage contributed<br />
+            {this.rageWasted} Rage wasted
+          </>
+        )}
       />
     );
   }

@@ -118,7 +118,27 @@ export const Bonebasher = {
 export const Sharrq = {
   nickname: 'Sharrq',
   github: 'Sharrq',
+  discord: 'Sharrq#7530',
   avatar: require('./interface/images/avatars/Sharrq_avatar.jpg'),
+  mains: [
+    {
+      name: 'Sharrq',
+      spec: SPECS.FROST_MAGE,
+      link: 'https://worldofwarcraft.com/en-us/character/us/bleeding-hollow/sharrq',
+    }],
+    alts: [{
+      name: 'Maniaq',
+      spec: SPECS.SHADOW_PRIEST,
+      link: 'https://worldofwarcraft.com/en-us/character/us/bleeding-hollow/maniaq',
+    }, {
+      name: 'Requva',
+      spec: SPECS.MISTWEAVER_MONK,
+      link: 'https://worldofwarcraft.com/en-us/character/us/bleeding-hollow/requva',
+    }, {
+      name: 'Fraqture',
+      spec: SPECS.PROTECTION_PALADIN,
+      link: 'https://worldofwarcraft.com/en-us/character/us/bleeding-hollow/fraqture',
+    }],
 };
 export const Khazak = {
   nickname: 'Khazak',
@@ -163,6 +183,24 @@ export const Fyruna = {
   nickname: 'Fyruna',
   github: 'Fyruna',
   avatar: require('./interface/images/avatars/Fyruna_avatar.jpg'),
+  mains: [{
+    name: 'Aevaa',
+    spec: SPECS.ASSASSINATION_ROGUE,
+    link: 'https://worldofwarcraft.com/en-gb/character/magtheridon/aevaa',
+  }],
+  alts: [{
+    name: 'Aeri',
+    spec: SPECS.BREWMASTER_MONK,
+    link: 'https://worldofwarcraft.com/en-gb/character/magtheridon/aeri',
+  }, {
+    name: 'Avynn',
+    spec: SPECS.DISCIPLINE_PRIEST,
+    link: 'https://worldofwarcraft.com/en-gb/character/magtheridon/avynn',
+  }, {
+    name: 'Seiralia',
+    spec: SPECS.RESTORATION_DRUID,
+    link: 'https://worldofwarcraft.com/en-gb/character/sporeggar/seiralia',
+  }],
 };
 export const Anomoly = {
   nickname: 'Anomoly',
@@ -227,6 +265,10 @@ export const Chizu = {
   nickname: 'Chizu',
   github: 'sMteX',
   avatar: require('./interface/images/avatars/Chizu_avatar.jpg'),
+};
+export const Gwelican = {
+  nickname: 'Gwelican',
+  github: 'gwelican',
 };
 export const Hordehobbs = {
   nickname: 'Hordehobbs',
@@ -362,6 +404,23 @@ export const kyleglick = {
 export const Zeboot = {
   nickname: 'Zeboot',
   github: 'Zeboot',
+  discord: 'Zeboot#0001',
+  avatar: require('./interface/images/avatars/Zeboot-avatar.png'),
+  mains: [
+    {
+      name: 'Zebeer',
+      spec: SPECS.BREWMASTER_MONK,
+      link: 'https://worldofwarcraft.com/en-us/character/us/whisperwind/zebeer',
+    }, {
+      name: 'Zeboot',
+      spec: SPECS.GUARDIAN_DRUID,
+      link: 'https://worldofwarcraft.com/en-us/character/us/whisperwind/zeboot',
+    }],
+    alts: [{
+      name: 'Zelightsneak',
+      spec: SPECS.ASSASSINATION_ROGUE,
+      link: 'https://worldofwarcraft.com/en-us/character/us/whisperwind/zelightsneak',
+    }],
 };
 export const HawkCorrigan = {
   nickname: 'HawkCorrigan',
@@ -550,4 +609,87 @@ export const Eylwen = {
 export const Korebian = {
   nickname: 'Korebian',
   github: 'Asamsig',
+};
+export const _4Ply = {
+  nickname: '4Ply',
+  github: '4Ply',
+  discord: '4Ply#9270',
+  mains: [{
+    name: 'Uzdrowiciela',
+    spec: SPECS.RESTORATION_DRUID,
+    link: 'https://worldofwarcraft.com/en-gb/character/sylvanas/Uzdrowiciela',
+  }],
+};
+export const Dorixius = {
+  nickname: 'Dorixius',
+  github: 'florianschut',
+  avatar: require('./interface/images/avatars/dorixius-avatar.jpeg'),
+  discord: 'Florian#9270',
+  mains: [{
+    name:'Dorixius',
+    spec: SPECS.UNHOLY_DEATH_KNIGHT,
+    link: 'https://worldofwarcraft.com/en-gb/character/steamwheedle-cartel/Dorixius',
+  }],
+};
+export const Skeletor = {
+  nickname: 'Skeletor',
+  github: 'LordSkeletor',
+  discord: 'Skeletor#0001',
+  avatar: require('./interface/images/avatars/Skeletor_avatar.png'),
+  mains: [{
+    name: 'Ilivath',
+    spec: SPECS.RETRIBUTION_PALADIN,
+    link: 'https://worldofwarcraft.com/en-us/character/zuljin/Ilivath',
+    }],
+  links: {
+    'RetPaladin.XYZ': 'https://www.retpaladin.xyz/ret-paladin-8-1-0-pve-guide',
+  },
+};
+export const Abelito75 = {
+  nickname: 'Abelito75',
+  github: 'abelito75',
+  avatar: require('./interface/images/avatars/Abelito75-avatar.png'),
+};
+export const HolySchmidt = {
+  nickname: 'HolySchmidt',
+  github: '5chmidt',
+  avatar: require('./interface/images/avatars/holyschmidt-avatar.jpg'),
+  desc: 'Holy Paladin, Tinkerer',
+  mains: [{
+    name: 'HolySchmidt',
+    spec: SPECS.HOLY_PALADIN,
+    link: 'https://worldofwarcraft.com/en-us/character/us/whisperwind/holyschmidt',
+  }],
+};
+export const Coywolf = {
+  nickname: 'Coywolf',
+  github: 'Coywolf',
+  discord: 'Coywolf#3500',
+  mains: [{
+    name: 'Coywolf',
+    spec: SPECS.OUTLAW_ROGUE,
+    link: 'https://worldofwarcraft.com/en-us/character/us/arthas/coywolf',
+  }],
+};
+export const Scotsoo = {
+  nickname: 'Scotsoo',
+  github: 'Scotsoo',
+  discord: 'Scotsoo#5328',
+  avatar: require('./interface/images/avatars/Scotsoo-avatar.jpg'),
+  mains: [{
+    name: 'Scotsoodh',
+    spec: SPECS.HAVOC_DEMON_HUNTER,
+    link: 'https://worldofwarcraft.com/en-us/character/eu/tarren-mill/scotsoodh',
+  }],
+};
+export const LeoZhekov = {
+  nickname: 'LeoZhekov',
+  github: 'LeoZhekov',
+  discord: 'LeoZhekov#6641',
+  avatar: require('./interface/images/avatars/LeoZhekov-avatar.jpg'),
+  mains: [{
+    name: 'Lisossa',
+    spec: SPECS.SURVIVAL_HUNTER,
+    link: 'https://worldofwarcraft.com/en-gb/character/Zenedar/Lisossa',
+  }],
 };

@@ -5,7 +5,7 @@ import CoreAbilities from 'parser/core/modules/Abilities';
 class Abilities extends CoreAbilities {
   spellbook() {
     const combatant = this.selectedCombatant;
-    const brew_cooldown = 15 - (combatant.hasTalent(SPELLS.LIGHT_BREWING_TALENT.id) ? 3 : 0);
+    const brewCooldown = 15 - (combatant.hasTalent(SPELLS.LIGHT_BREWING_TALENT.id) ? 3 : 0);
     return [
       // Rotational Spells
       {
@@ -72,7 +72,7 @@ class Abilities extends CoreAbilities {
         spell: [SPELLS.IRONSKIN_BREW, SPELLS.PURIFYING_BREW],
         buffSpellId: SPELLS.IRONSKIN_BREW_BUFF.id,
         category: Abilities.SPELL_CATEGORIES.DEFENSIVE,
-        cooldown: haste => brew_cooldown / (1 + haste),
+        cooldown: haste => brewCooldown / (1 + haste),
         charges: combatant.hasTalent(SPELLS.LIGHT_BREWING_TALENT.id) ? 4 : 3,
         gcd: null,
         castEfficiency: {
@@ -212,7 +212,7 @@ class Abilities extends CoreAbilities {
       },
       // Its unlikely that these spells will ever be cast but if they are they will show.
       {
-        spell: SPELLS.DETOX,
+        spell: SPELLS.DETOX_ENERGY,
         category: Abilities.SPELL_CATEGORIES.UTILITY,
         gcd: {
           // This was tested in-game (in Legion): it does NOT have a static GCD but a base GCD of 1sec and scales with Haste

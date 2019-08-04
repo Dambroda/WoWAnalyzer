@@ -1,5 +1,4 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 import ArcaneTorrent from 'parser/shared/modules/racials/bloodelf/ArcaneTorrent';
 
 import GrimoireOfSacrificeNormalizer from '../shared/modules/talents/normalizers/GrimoireOfSacrificeNormalizer';
@@ -19,7 +18,6 @@ import SoulShardDetails from './modules/soulshards/SoulShardDetails';
 import Channeling from './modules/core/Channeling';
 import GlobalCooldown from './modules/core/GlobalCooldown';
 
-import Talents from './modules/talents';
 import Nightfall from './modules/talents/Nightfall';
 import DrainSoul from './modules/talents/DrainSoul';
 import Deathbolt from './modules/talents/Deathbolt';
@@ -47,7 +45,6 @@ class CombatLogParser extends CoreCombatLogParser {
     abilities: Abilities,
     alwaysBeCasting: AlwaysBeCasting,
     cooldownThroughputTracker: CooldownThroughputTracker,
-    damageDone: [DamageDone, { showStatistic: true }],
     checklist: Checklist,
     darkglare: Darkglare,
 
@@ -67,7 +64,6 @@ class CombatLogParser extends CoreCombatLogParser {
     globalCooldown: GlobalCooldown,
 
     // Talents
-    talents: Talents,
     nightfall: Nightfall,
     drainSoul: DrainSoul,
     deathbolt: Deathbolt,

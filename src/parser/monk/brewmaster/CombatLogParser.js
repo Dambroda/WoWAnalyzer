@@ -1,5 +1,4 @@
 import CoreCombatLogParser from 'parser/core/CombatLogParser';
-import DamageDone from 'parser/shared/modules/DamageDone';
 // Core
 import HealingDone from './modules/core/HealingDone';
 import DamageTaken from './modules/core/DamageTaken';
@@ -12,6 +11,8 @@ import GlobalCooldown from './modules/core/GlobalCooldown';
 import Channeling from './modules/core/Channeling';
 import MasteryValue from './modules/core/MasteryValue';
 import AgilityValue from './modules/features/AgilityValue';
+import VersatilityValue from './modules/features/VersatilityValue';
+import CritValue from './modules/features/CritValue';
 import SpellUsable from './modules/core/SpellUsable';
 // Spells
 import IronSkinBrew from './modules/spells/IronSkinBrew';
@@ -39,6 +40,7 @@ import AlwaysBeCasting from './modules/features/AlwaysBeCasting';
 import StaggerPoolGraph from './modules/features/StaggerPoolGraph';
 import MitigationCheck from './modules/features/MitigationCheck';
 import MitigationSheet from './modules/features/MitigationSheet';
+import HotTrubTimeMachine from './modules/features/HotTrubTimeMachine';
 
 // Items
 // normalizers
@@ -49,18 +51,19 @@ import ExpelHarmNorm from './normalizers/ExpelHarm';
 class CombatLogParser extends CoreCombatLogParser {
   static specModules = {
     // Core
-    healingDone: [HealingDone, { showStatistic: true }],
+    healingDone: HealingDone,
     healingReceived: HealingReceived,
-    damageTaken: [DamageTaken, { showStatistic: true }],
+    damageTaken: DamageTaken,
     stagger: Stagger,
     staggerFabricator: StaggerFabricator,
-    damageDone: [DamageDone, { showStatistic: true }],
     brewCdr: BrewCDR,
     brews: SharedBrews,
     channeling: Channeling,
     globalCooldown: GlobalCooldown,
     agilityValue: AgilityValue,
     masteryValue: MasteryValue,
+    versValue: VersatilityValue,
+    critValue: CritValue,
     mitigationCheck: MitigationCheck,
     spellUsable: SpellUsable,
 
@@ -70,6 +73,7 @@ class CombatLogParser extends CoreCombatLogParser {
     abilities: Abilities,
     staggerPoolGraph: StaggerPoolGraph,
     sheet: MitigationSheet,
+    hotTrubTimeMachine: HotTrubTimeMachine,
 
     // Spells
     ironSkinBrew: IronSkinBrew,
