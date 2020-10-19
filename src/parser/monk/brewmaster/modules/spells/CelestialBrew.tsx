@@ -99,7 +99,7 @@ class CelestialBrew extends Analyzer {
 
   private _cbAbsorb(event: AbsorbedEvent) {
     if(this._currentAbsorb === undefined) {
-      console.error("CB absorb detected without CB active!", event);
+      console.error('CB absorb detected without CB active!', event);
       return;
     }
 
@@ -108,7 +108,7 @@ class CelestialBrew extends Analyzer {
 
   private _expireAbsorb(event: RemoveBuffEvent) {
     if(this._currentAbsorb === undefined) {
-      console.error("CB expired but was never applied!", event);
+      console.error('CB expired but was never applied!', event);
       return;
     }
 

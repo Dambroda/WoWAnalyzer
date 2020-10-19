@@ -18,5 +18,5 @@ export function currentStacks(event: RemoveBuffEvent | RemoveDebuffEvent | Apply
     case EventType.RemoveDebuffStack:
       return event.stack;
   }
-  throw new Error("Invalid event type for currentStacks");
+  throw new Error('Invalid event type for currentStacks');
 }

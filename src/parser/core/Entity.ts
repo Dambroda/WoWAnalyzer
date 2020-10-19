@@ -42,7 +42,7 @@ class Entity {
   }
 
   // Override in extended classes
-  get name(): string { throw new Error("attempted to access name of unimplemented Entity"); }
+  get name(): string { throw new Error('attempted to access name of unimplemented Entity'); }
 
   activeBuffs(forTimestamp: number | null = null, bufferTime = 0, minimalActiveTime = 0) {
     const currentTimestamp = forTimestamp !== null ? forTimestamp : this.owner.currentTimestamp;

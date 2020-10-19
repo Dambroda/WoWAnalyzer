@@ -87,7 +87,7 @@ export default class LightOfTheProtector extends Analyzer {
     }
     const delay = event.timestamp - (this._lastHit ? this._lastHit.timestamp : 0) - this._msTilHeal;
     if(delay < 0) {
-      console.error("LotP/HotP delay came out negative", delay);
+      console.error('LotP/HotP delay came out negative', delay);
     }
     this._delays.push(delay);
 

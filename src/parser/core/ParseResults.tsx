@@ -106,7 +106,7 @@ export class NumberSuggestionAssertion extends SuggestionAssertion<number> {
       threshold = threshold.minor ?? threshold.average ?? threshold.major;
     }
     if (threshold === undefined) {
-      throw new Error("You must set a number threshold before finalizing the suggestion");
+      throw new Error('You must set a number threshold before finalizing the suggestion');
     }
     return threshold;
   }
@@ -188,7 +188,7 @@ export class BoolSuggestionAssertion extends SuggestionAssertion<boolean> {
 
   get _triggerThreshold(): boolean {
     if(this._compareTo === undefined) {
-      throw new Error("You must set a boolean target before finalizing the suggestion");
+      throw new Error('You must set a boolean target before finalizing the suggestion');
     }
     return this._compareTo;
   }
@@ -347,15 +347,15 @@ class ParseResults {
         // @ts-ignore
         return new NumberSuggestionAssertion(threshold, this.addIssue);
       } else if (typeof threshold === "string") {
-        captureException(new Error("Sent string threshold, only number and boolean allowed"));
+        captureException(new Error('Sent string threshold, only number and boolean allowed'));
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore TODO find all instances of javascript sending in formatted numbers here (via captured error above), then remove this
         return new NumberSuggestionAssertion(Number(threshold), this.addIssue);
-      } else if (typeof threshold === "boolean") {
+      } else if (typeof threshold === 'boolean') {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         return new BoolSuggestionAssertion(threshold, this.addIssue);
-      } else if (typeof threshold === "object") {
+      } else if (typeof threshold === 'object') {
         const th = threshold as Threshold<any>;
         switch (th.style) {
           case ThresholdStyle.BOOLEAN:
@@ -368,7 +368,7 @@ class ParseResults {
             return new NumberSuggestionAssertion(threshold, this.addIssue);
         }
       }
-      throw new Error("Invalid threshold type");
+      throw new Error('Invalid threshold type');
     },
   }
 
